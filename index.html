@@ -24,6 +24,12 @@
       max-width: 300px;
       word-wrap: break-word;
     }
+    #scan-again-btn {
+      display: none;
+      margin-top: 15px;
+      padding: 8px 16px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -36,8 +42,13 @@
 
   <p id="status">Waiting for scan...</p>
 
+  <button id="scan-again-btn" onclick="restartScanner()">🔄 Scan Again</button>
+
   <script>
     const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
+
+    let scanner;
+    let isScanning = true;
 
     function sendToSheet(data) {
       fetch(sheetWebhookURL, {
@@ -50,10 +61,7 @@
       .then(res => res.text())
       .then(msg => {
         document.getElementById("status").innerText = msg;
-        setTimeout(() => {
-          document.getElementById("status").innerText = "Waiting for scan...";
-          document.getElementById("scannedText").innerText = "No scan yet...";
-        }, 5000);
+        document.getElementById("scan-again-btn").style.display = "inline-block";
       })
       .catch(err => {
         document.getElementById("status").innerText = "❌ Failed to log attendance";
@@ -61,19 +69,43 @@
     }
 
     function onScanSuccess(decodedText, decodedResult) {
+      if (!isScanning) return;
+      isScanning = false; // prevent further scans
+
       document.getElementById("scannedText").innerText = decodedText;
-      sendToSheet(decodedText);
+      document.getElementById("status").innerText = "⏳ Sending...";
+      scanner.stop().then(() => {
+        sendToSheet(decodedText);
+      });
     }
 
     const html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: 250
-      },
-      onScanSuccess
-    );
+
+    function startScanner() {
+      isScanning = true;
+      html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        onScanSuccess
+      ).then(s => {
+        scanner = html5QrCode;
+      }).catch(err => {
+        document.getElementById("status").innerText = "❌ Camera error: " + err;
+      });
+    }
+
+    function restartScanner() {
+      document.getElementById("scannedText").innerText = "No scan yet...";
+      document.getElementById("status").innerText = "Waiting for scan...";
+      document.getElementById("scan-again-btn").style.display = "none";
+      startScanner();
+    }
+
+    // Start for the first time
+    startScanner();
   </script>
 </body>
 </html>
