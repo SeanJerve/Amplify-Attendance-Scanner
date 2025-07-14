@@ -26,6 +26,10 @@
       margin: 10px auto;
       word-wrap: break-word;
     }
+    #zoomSlider {
+      width: 300px;
+      margin: 10px auto;
+    }
     button {
       margin: 5px;
       padding: 8px 16px;
@@ -40,6 +44,7 @@
   <h2>📸 QR Attendance Scanner</h2>
 
   <div id="reader"></div>
+  <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
 
   <p><strong>Scanned Content:</strong></p>
   <pre id="scannedText">No scan yet...</pre>
@@ -53,6 +58,8 @@
 
   <script>
     const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
+    const html5QrCode = new Html5Qrcode("reader");
+    let videoTrack = null;
 
     function sendToSheet(data, isManual = false) {
       fetch(sheetWebhookURL, {
@@ -73,7 +80,7 @@
       });
     }
 
-    function onScanSuccess(decodedText, decodedResult) {
+    function onScanSuccess(decodedText) {
       document.getElementById("scannedText").innerText = decodedText;
       sendToSheet(decodedText);
     }
@@ -88,12 +95,43 @@
       document.getElementById("manualInput").value = "";
     }
 
-    const html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      onScanSuccess
-    );
+    // Start scanner and configure zoom if available
+    async function startScanner() {
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length) {
+        const cameraId = devices[0].id;
+        await html5QrCode.start(
+          { deviceId: { exact: cameraId } },
+          { fps: 10, qrbox: 250 },
+          onScanSuccess
+        ).then(() => {
+          // Wait a moment then access the video stream safely
+          setTimeout(() => {
+            const video = document.querySelector("video");
+            if (video && video.srcObject) {
+              videoTrack = video.srcObject.getVideoTracks()[0];
+              const caps = videoTrack.getCapabilities?.();
+              const slider = document.getElementById("zoomSlider");
+
+              if (caps && caps.zoom) {
+                slider.min = caps.zoom.min;
+                slider.max = caps.zoom.max;
+                slider.step = caps.zoom.step || 0.1;
+                slider.value = caps.zoom.min;
+                slider.disabled = false;
+                slider.oninput = () => {
+                  videoTrack.applyConstraints({ advanced: [{ zoom: parseFloat(slider.value) }] });
+                };
+              }
+            }
+          }, 1000); // Wait to ensure video is ready
+        });
+      } else {
+        document.getElementById("status").innerText = "❌ No camera found.";
+      }
+    }
+
+    startScanner();
   </script>
 </body>
 </html>
