@@ -4,42 +4,33 @@
   <meta charset="UTF-8">
   <title>QR Attendance Scanner</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
- <style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    text-align: center;
-  }
-  #reader {
-    width: 90%;
-    max-width: 600px;
-    margin: auto;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-  }
-  #status {
-    font-weight: bold;
-    color: green;
-    margin-top: 10px;
-  }
-  #scannedText {
-    background: #f0f0f0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    max-width: 90%;
-    margin: auto;
-    word-wrap: break-word;
-    font-size: 14px;
-  }
-  #scan-again-btn {
-    display: none;
-    margin-top: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-</style>
-
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #reader {
+      width: 300px;
+      margin-bottom: 20px;
+    }
+    #status {
+      font-weight: bold;
+      color: green;
+    }
+    #scannedText {
+      background: #f0f0f0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      max-width: 300px;
+      word-wrap: break-word;
+    }
+    #scan-again-btn {
+      display: none;
+      margin-top: 15px;
+      padding: 8px 16px;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
   <h2>📸 QR Attendance Scanner</h2>
@@ -51,70 +42,100 @@
 
   <p id="status">Waiting for scan...</p>
 
+  <!-- Add this in your <body> -->
+<div style="margin-top: 10px;">
+  <label for="zoomSlider"><strong>🔍 Zoom:</strong></label>
+  <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
+</div>
+
+
   <button id="scan-again-btn" onclick="restartScanner()">🔄 Scan Again</button>
 
   <script>
-    const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
+  const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
 
-    let scanner;
-    let isScanning = true;
+  let html5QrCode;
+  let cameraId;
+  let currentStream;
+  let isScanning = true;
 
-    function sendToSheet(data) {
-      fetch(sheetWebhookURL, {
-        method: "POST",
-        body: data,
-        headers: {
-          "Content-Type": "text/plain"
-        }
-      })
-      .then(res => res.text())
-      .then(msg => {
-        document.getElementById("status").innerText = msg;
-        document.getElementById("scan-again-btn").style.display = "inline-block";
-      })
-      .catch(err => {
-        document.getElementById("status").innerText = "❌ Failed to log attendance";
-      });
-    }
+  function sendToSheet(data) {
+    fetch(sheetWebhookURL, {
+      method: "POST",
+      body: data,
+      headers: { "Content-Type": "text/plain" }
+    })
+    .then(res => res.text())
+    .then(msg => {
+      document.getElementById("status").innerText = msg;
+      document.getElementById("scan-again-btn").style.display = "inline-block";
+    })
+    .catch(err => {
+      document.getElementById("status").innerText = "❌ Failed to log attendance";
+    });
+  }
 
-    function onScanSuccess(decodedText, decodedResult) {
-      if (!isScanning) return;
-      isScanning = false; // prevent further scans
+  function onScanSuccess(decodedText) {
+    if (!isScanning) return;
+    isScanning = false;
 
-      document.getElementById("scannedText").innerText = decodedText;
-      document.getElementById("status").innerText = "⏳ Sending...";
-      scanner.stop().then(() => {
-        sendToSheet(decodedText);
-      });
-    }
+    document.getElementById("scannedText").innerText = decodedText;
+    document.getElementById("status").innerText = "⏳ Sending...";
+    html5QrCode.stop().then(() => {
+      sendToSheet(decodedText);
+    });
+  }
 
-    const html5QrCode = new Html5Qrcode("reader");
+  async function startScanner() {
+    isScanning = true;
+    html5QrCode = new Html5Qrcode("reader");
 
-    function startScanner() {
-      isScanning = true;
+    const devices = await Html5Qrcode.getCameras();
+    if (devices && devices.length) {
+      cameraId = devices[0].id;
+
       html5QrCode.start(
-        { facingMode: "environment" },
+        { deviceId: { exact: cameraId } },
         {
           fps: 10,
-          qrbox: { width: 500, height: 500 }
+          qrbox: { width: 400, height: 400 }
         },
         onScanSuccess
-      ).then(s => {
-        scanner = html5QrCode;
-      }).catch(err => {
-        document.getElementById("status").innerText = "❌ Camera error: " + err;
+      ).then(() => {
+        setupZoom();
       });
     }
+  }
 
-    function restartScanner() {
-      document.getElementById("scannedText").innerText = "No scan yet...";
-      document.getElementById("status").innerText = "Waiting for scan...";
-      document.getElementById("scan-again-btn").style.display = "none";
-      startScanner();
-    }
-
-    // Start for the first time
+  function restartScanner() {
+    document.getElementById("scannedText").innerText = "No scan yet...";
+    document.getElementById("status").innerText = "Waiting for scan...";
+    document.getElementById("scan-again-btn").style.display = "none";
+    document.getElementById("zoomSlider").disabled = true;
     startScanner();
-  </script>
+  }
+
+  function setupZoom() {
+    const videoTrack = html5QrCode.getRunningTrack();
+    const capabilities = videoTrack.getCapabilities();
+
+    if (capabilities.zoom) {
+      const slider = document.getElementById("zoomSlider");
+      slider.disabled = false;
+      slider.min = capabilities.zoom.min;
+      slider.max = capabilities.zoom.max;
+      slider.step = capabilities.zoom.step || 0.1;
+      slider.value = capabilities.zoom.min;
+
+      slider.oninput = () => {
+        const zoomLevel = parseFloat(slider.value);
+        videoTrack.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+      };
+    }
+  }
+
+  window.onload = startScanner;
+</script>
+
 </body>
 </html>
