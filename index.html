@@ -7,10 +7,12 @@
 <body>
   <h2>📸 QR Attendance Scanner</h2>
   <div id="reader" style="width: 300px;"></div>
+  <p><strong>Scanned Content:</strong></p>
+  <pre id="scannedText" style="background:#eee;padding:10px;"></pre>
   <p id="status"></p>
 
   <script>
-    const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec"; // 👈 Replace with your deployed Google Apps Script URL
+    const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
 
     function sendToSheet(data) {
       fetch(sheetWebhookURL, {
@@ -30,12 +32,13 @@
     }
 
     function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("scannedText").innerText = decodedText; // Show scanned content
       sendToSheet(decodedText);
     }
 
     const html5QrCode = new Html5Qrcode("reader");
     html5QrCode.start(
-      { facingMode: "environment" }, // use back camera
+      { facingMode: "environment" },
       {
         fps: 10,
         qrbox: 250
