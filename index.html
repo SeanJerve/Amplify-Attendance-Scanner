@@ -8,35 +8,27 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      text-align: center;
     }
     #reader {
-      width: 90%;
-      max-width: 600px;
-      margin: auto;
-      border: 2px solid #ccc;
-      border-radius: 10px;
+      width: 300px;
+      margin-bottom: 20px;
     }
     #status {
       font-weight: bold;
       color: green;
-      margin-top: 10px;
     }
     #scannedText {
       background: #f0f0f0;
       padding: 10px;
       border: 1px solid #ccc;
-      max-width: 90%;
-      margin: auto;
+      max-width: 300px;
       word-wrap: break-word;
-      font-size: 14px;
     }
     #scan-again-btn {
       display: none;
       margin-top: 15px;
-      padding: 10px 20px;
+      padding: 8px 16px;
       font-size: 16px;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -50,19 +42,13 @@
 
   <p id="status">Waiting for scan...</p>
 
-  <div style="margin-top: 10px;">
-    <label for="zoomSlider"><strong>🔍 Zoom:</strong></label>
-    <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
-  </div>
-
   <button id="scan-again-btn" onclick="restartScanner()">🔄 Scan Again</button>
 
   <script>
     const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
 
-    let html5QrCode;
+    let scanner;
     let isScanning = true;
-    let videoTrack = null;
 
     function sendToSheet(data) {
       fetch(sheetWebhookURL, {
@@ -82,68 +68,43 @@
       });
     }
 
-    function onScanSuccess(decodedText) {
+    function onScanSuccess(decodedText, decodedResult) {
       if (!isScanning) return;
-      isScanning = false;
+      isScanning = false; // prevent further scans
 
       document.getElementById("scannedText").innerText = decodedText;
       document.getElementById("status").innerText = "⏳ Sending...";
-
-      html5QrCode.stop().then(() => {
+      scanner.stop().then(() => {
         sendToSheet(decodedText);
       });
     }
 
-    async function startScanner() {
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function startScanner() {
       isScanning = true;
-      html5QrCode = new Html5QrCode("reader");
-
-      const devices = await Html5QrCode.getCameras();
-      const backCamera = devices.find(cam => cam.label.toLowerCase().includes("back")) || devices[0];
-
-      await html5QrCode.start(
-        { deviceId: { exact: backCamera.id } },
+      html5QrCode.start(
+        { facingMode: "environment" },
         {
           fps: 10,
           qrbox: { width: 500, height: 500 }
         },
         onScanSuccess
-      );
-
-      // Wait for video stream
-      const videoElement = document.querySelector("video");
-      const stream = videoElement?.srcObject;
-      videoTrack = stream?.getVideoTracks?.()[0];
-
-      if (videoTrack) {
-        const capabilities = videoTrack.getCapabilities?.();
-        if (capabilities?.zoom) {
-          const slider = document.getElementById("zoomSlider");
-          slider.disabled = false;
-          slider.min = capabilities.zoom.min;
-          slider.max = capabilities.zoom.max;
-          slider.step = capabilities.zoom.step || 0.1;
-          slider.value = capabilities.zoom.min;
-
-          slider.oninput = () => {
-            const zoomLevel = parseFloat(slider.value);
-            videoTrack.applyConstraints({
-              advanced: [{ zoom: zoomLevel }]
-            });
-          };
-        }
-      }
+      ).then(s => {
+        scanner = html5QrCode;
+      }).catch(err => {
+        document.getElementById("status").innerText = "❌ Camera error: " + err;
+      });
     }
 
     function restartScanner() {
       document.getElementById("scannedText").innerText = "No scan yet...";
       document.getElementById("status").innerText = "Waiting for scan...";
       document.getElementById("scan-again-btn").style.display = "none";
-      document.getElementById("zoomSlider").disabled = true;
       startScanner();
     }
 
-    // Start immediately on load
+    // Start for the first time
     startScanner();
   </script>
 </body>
