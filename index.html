@@ -1,15 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>QR Attendance Scanner</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #reader {
+      width: 300px;
+      margin-bottom: 20px;
+    }
+    #status {
+      font-weight: bold;
+      color: green;
+    }
+    #scannedText {
+      background: #f0f0f0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      max-width: 300px;
+      word-wrap: break-word;
+    }
+  </style>
 </head>
 <body>
   <h2>📸 QR Attendance Scanner</h2>
-  <div id="reader" style="width: 300px;"></div>
+
+  <div id="reader"></div>
+
   <p><strong>Scanned Content:</strong></p>
-  <pre id="scannedText" style="background:#eee;padding:10px;"></pre>
-  <p id="status"></p>
+  <pre id="scannedText">No scan yet...</pre>
+
+  <p id="status">Waiting for scan...</p>
 
   <script>
     const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
@@ -24,7 +49,11 @@
       })
       .then(res => res.text())
       .then(msg => {
-        document.getElementById("status").innerText = "✅ Attendance logged";
+        document.getElementById("status").innerText = msg;
+        setTimeout(() => {
+          document.getElementById("status").innerText = "Waiting for scan...";
+          document.getElementById("scannedText").innerText = "No scan yet...";
+        }, 5000);
       })
       .catch(err => {
         document.getElementById("status").innerText = "❌ Failed to log attendance";
@@ -32,7 +61,7 @@
     }
 
     function onScanSuccess(decodedText, decodedResult) {
-      document.getElementById("scannedText").innerText = decodedText; // Show scanned content
+      document.getElementById("scannedText").innerText = decodedText;
       sendToSheet(decodedText);
     }
 
