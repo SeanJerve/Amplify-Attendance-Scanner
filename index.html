@@ -8,6 +8,7 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
+      text-align: center;
     }
     #reader {
       width: 300px;
@@ -17,12 +18,22 @@
       font-weight: bold;
       color: green;
     }
-    #scannedText {
+    #scannedText, #manualInput {
       background: #f0f0f0;
       padding: 10px;
       border: 1px solid #ccc;
       max-width: 300px;
+      margin: 10px auto;
       word-wrap: break-word;
+    }
+    #zoomSlider {
+      width: 300px;
+      margin: 10px auto;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 16px;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -31,49 +42,107 @@
 
   <div id="reader"></div>
 
+  <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
+
   <p><strong>Scanned Content:</strong></p>
   <pre id="scannedText">No scan yet...</pre>
-
   <p id="status">Waiting for scan...</p>
+  <button id="scan-again-btn" onclick="restartScanner()" style="display:none;">🔄 Scan Again</button>
+
+  <hr>
+  <h3>📋 Manual QR Text Input (Alternative)</h3>
+  <textarea id="manualInput" placeholder="Paste QR text here..." rows="5" cols="40"></textarea><br>
+  <button onclick="submitManualInput()">📤 Submit Attendance</button>
 
   <script>
     const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
+    let html5QrCode;
+    let videoTrack = null;
+    let isScanning = true;
 
-    function sendToSheet(data) {
+    function sendToSheet(data, isManual = false) {
       fetch(sheetWebhookURL, {
         method: "POST",
         body: data,
-        headers: {
-          "Content-Type": "text/plain"
-        }
+        headers: { "Content-Type": "text/plain" }
       })
       .then(res => res.text())
       .then(msg => {
-        document.getElementById("status").innerText = msg;
+        document.getElementById("status").innerText = isManual ? "✅ Manual attendance sent!" : "✅ Attendance logged!";
+        document.getElementById("scan-again-btn").style.display = "inline-block";
         setTimeout(() => {
           document.getElementById("status").innerText = "Waiting for scan...";
           document.getElementById("scannedText").innerText = "No scan yet...";
-        }, 5000);
+        }, 4000);
       })
-      .catch(err => {
-        document.getElementById("status").innerText = "❌ Failed to log attendance";
+      .catch(() => {
+        document.getElementById("status").innerText = "❌ Failed to send attendance";
       });
     }
 
-    function onScanSuccess(decodedText, decodedResult) {
+    function onScanSuccess(decodedText) {
+      if (!isScanning) return;
+      isScanning = false;
       document.getElementById("scannedText").innerText = decodedText;
-      sendToSheet(decodedText);
+      document.getElementById("status").innerText = "⏳ Sending...";
+      html5QrCode.stop().then(() => sendToSheet(decodedText));
     }
 
-    const html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 500, height: 500 }
-      },
-      onScanSuccess
-    );
+    async function startScanner() {
+      isScanning = true;
+      html5QrCode = new Html5QrCode("reader");
+      try {
+        const devices = await Html5QrCode.getCameras();
+        if (!devices || devices.length === 0) throw new Error("No camera devices found");
+
+        const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
+        await html5QrCode.start(
+          { deviceId: { exact: backCam.id } },
+          { fps: 10, qrbox: 250 },
+          onScanSuccess
+        );
+
+        const videoElement = document.querySelector("video");
+        const stream = videoElement?.srcObject;
+        videoTrack = stream?.getVideoTracks?.()[0];
+        if (videoTrack) {
+          const caps = videoTrack.getCapabilities?.();
+          if (caps?.zoom) {
+            const slider = document.getElementById("zoomSlider");
+            slider.disabled = false;
+            slider.min = caps.zoom.min;
+            slider.max = caps.zoom.max;
+            slider.step = caps.zoom.step || 0.1;
+            slider.value = caps.zoom.min;
+            slider.oninput = () => {
+              videoTrack.applyConstraints({ advanced: [{ zoom: parseFloat(slider.value) }] });
+            };
+          }
+        }
+      } catch (err) {
+        document.getElementById("status").innerText = "❌ Camera error: " + err.message;
+      }
+    }
+
+    function restartScanner() {
+      document.getElementById("scannedText").innerText = "No scan yet...";
+      document.getElementById("status").innerText = "Waiting for scan...";
+      document.getElementById("scan-again-btn").style.display = "none";
+      document.getElementById("zoomSlider").disabled = true;
+      if (html5QrCode) html5QrCode.stop().then(startScanner);
+    }
+
+    function submitManualInput() {
+      const data = document.getElementById("manualInput").value.trim();
+      if (!data) {
+        alert("⚠️ Please paste QR text first.");
+        return;
+      }
+      sendToSheet(data, true);
+      document.getElementById("manualInput").value = "";
+    }
+
+    startScanner();
   </script>
 </body>
 </html>
