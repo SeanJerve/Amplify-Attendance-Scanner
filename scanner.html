@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QR Attendance Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+  <h2>📸 QR Attendance Scanner</h2>
+  <div id="reader" style="width: 300px;"></div>
+  <p id="status"></p>
+
+  <script>
+    const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbyvsGznVR0hHVedY9MYKwjDA9b_V6a2GFoOOSBOlKJ8CF03_IIII-QRod8dSglQQRUz/exec"; // 👈 Replace with your deployed Google Apps Script URL
+
+    function sendToSheet(data) {
+      fetch(sheetWebhookURL, {
+        method: "POST",
+        body: data,
+        headers: {
+          "Content-Type": "text/plain"
+        }
+      })
+      .then(res => res.text())
+      .then(msg => {
+        document.getElementById("status").innerText = "✅ Attendance logged";
+      })
+      .catch(err => {
+        document.getElementById("status").innerText = "❌ Failed to log attendance";
+      });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      sendToSheet(decodedText);
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start(
+      { facingMode: "environment" }, // use back camera
+      {
+        fps: 10,
+        qrbox: 250
+      },
+      onScanSuccess
+    );
+  </script>
+</body>
+</html>
