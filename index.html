@@ -83,39 +83,46 @@
     }
 
     function parseStudentData(raw) {
-      try {
-        const studentId = raw.substring(0, 16).trim();
-        const nameStart = 16;
-        const collegeIndex = raw.indexOf("COLLEGE OF");
-        const name = raw.substring(nameStart, collegeIndex).trim();
+  try {
+    const studentId = raw.substring(0, 16).trim();
+    const nameStart = 16;
+    const collegeIndex = raw.indexOf("COLLEGE OF");
+    const name = raw.substring(nameStart, collegeIndex).trim();
 
-        const collegeStart = collegeIndex;
-        const courseIndex = raw.indexOf("BS", collegeStart);
-        const college = raw.substring(collegeStart, courseIndex).trim();
+    const collegeStart = collegeIndex;
+    const courseIndex = raw.indexOf("BS", collegeStart);
+    const college = raw.substring(collegeStart, courseIndex).trim();
 
-        const birthdayMatch = raw.match(/(\d{2}\/\d{2}\/\d{4})/);
-        const birthday = birthdayMatch ? birthdayMatch[0] : "N/A";
+    const birthdayMatch = raw.match(/(\d{2}\/\d{2}\/\d{4})/);
+    const birthday = birthdayMatch ? birthdayMatch[0] : "N/A";
 
-        const course = raw.substring(courseIndex, raw.indexOf(birthday)).trim();
+    const course = raw.substring(courseIndex, raw.indexOf(birthday)).trim();
 
-        const phoneMatch = raw.match(/(09\d{9})/);
-        const phone = phoneMatch ? phoneMatch[0] : "N/A";
+    const phoneMatches = raw.match(/(09\d{9})/g); // Get all 11-digit phones
+    const phone = phoneMatches && phoneMatches.length > 0 ? phoneMatches[0] : "N/A";
 
-        const addressStart = raw.indexOf(birthday) + birthday.length;
-        const addressEnd = raw.indexOf(phone);
-        const address = raw.substring(addressStart, addressEnd).trim();
+    const addressStart = raw.indexOf(birthday) + birthday.length;
+    const addressEnd = raw.indexOf(phone);
+    const address = raw.substring(addressStart, addressEnd).trim();
 
-        const date = new Date();
-        return {
-          studentId, name, college, course,
-          birthday, address, phone,
-          date: date.toISOString().split("T")[0],
-          time: formatTime(date)
-        };
-      } catch (err) {
-        return null;
-      }
-    }
+    const date = new Date();
+    return {
+      studentId,
+      name,
+      college,
+      course,
+      birthday,
+      address,
+      phone,
+      date: date.toISOString().split("T")[0],
+      time: formatTime(date)
+    };
+  } catch (err) {
+    console.error("Parsing error:", err);
+    return null;
+  }
+}
+
 
     function showPreview(data) {
       document.getElementById("preview").innerText =
@@ -152,7 +159,7 @@
     return res.text();
   })
   .then(msg => {
-    document.getElementById("status").innerText = msg;
+    document.getElementById("status").innerText = "✅ Server responded:\n" + msg;
     document.getElementById("preview").innerText = "No scan yet...";
     document.getElementById("confirmBtn").disabled = true;
     document.getElementById("yearLevel").value = "";
