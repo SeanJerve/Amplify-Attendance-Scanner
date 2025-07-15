@@ -135,26 +135,35 @@
     }
 
     function submitAttendance() {
-      const year = document.getElementById("yearLevel").value;
-      if (!year || !currentData) {
-        alert("Please select a year level and scan a valid QR.");
-        return;
-      }
-      const payload = JSON.stringify({ ...currentData, yearLevel: year });
-      fetch(sheetWebhookURL, {
-        method: "POST",
-        body: payload,
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(res => res.text())
-      .then(msg => {
-        document.getElementById("status").innerText = msg;
-        document.getElementById("preview").innerText = "No scan yet...";
-        document.getElementById("confirmBtn").disabled = true;
-        document.getElementById("yearLevel").value = "";
-        currentData = null;
-      });
-    }
+  const year = document.getElementById("yearLevel").value;
+  if (!year || !currentData) {
+    alert("Please select a year level and scan a valid QR.");
+    return;
+  }
+  const payload = JSON.stringify({ ...currentData, yearLevel: year });
+
+  fetch(sheetWebhookURL, {
+    method: "POST",
+    body: payload,
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Network response was not ok");
+    return res.text();
+  })
+  .then(msg => {
+    document.getElementById("status").innerText = msg;
+    document.getElementById("preview").innerText = "No scan yet...";
+    document.getElementById("confirmBtn").disabled = true;
+    document.getElementById("yearLevel").value = "";
+    currentData = null;
+  })
+  .catch(err => {
+    document.getElementById("status").innerText = "❌ Failed to send attendance.\n" + err.message;
+    console.error("Submission error:", err);
+  });
+}
+
 
     function submitManualInput() {
       const raw = document.getElementById("manualInput").value.trim();
