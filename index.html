@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,18 +11,18 @@
       text-align: center;
     }
     #reader {
-      width: 300px;
+      width: 320px;
       margin: 0 auto 20px;
     }
     #status {
       font-weight: bold;
       color: green;
     }
-    #scannedText, #manualInput {
-      background: #f0f0f0;
+    #preview {
+      background: #f9f9f9;
       padding: 10px;
       border: 1px solid #ccc;
-      max-width: 300px;
+      max-width: 320px;
       margin: 10px auto;
       word-wrap: break-word;
     }
@@ -31,9 +30,9 @@
       width: 300px;
       margin: 10px auto;
     }
-    button {
+    select, button, textarea {
       margin: 5px;
-      padding: 8px 16px;
+      padding: 8px;
       font-size: 16px;
     }
     hr {
@@ -47,66 +46,134 @@
   <div id="reader"></div>
   <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
 
-  <p><strong>Scanned Content:</strong></p>
-  <pre id="scannedText">No scan yet...</pre>
+  <p><strong>Student Info Preview:</strong></p>
+  <pre id="preview">No scan yet...</pre>
+
+  <label for="yearLevel">Select Year Level:</label>
+  <select id="yearLevel">
+    <option value="">-- Select Year Level --</option>
+    <option value="1st Year">1st Year</option>
+    <option value="2nd Year">2nd Year</option>
+    <option value="3rd Year">3rd Year</option>
+    <option value="4th Year">4th Year</option>
+  </select>
+  <br>
+  <button onclick="submitAttendance()" id="confirmBtn" disabled>📤 Confirm and Send to Google Sheets</button>
 
   <p id="status">Waiting for scan...</p>
 
   <hr>
-  <h3>📋 Manual QR Text Input (Alternative)</h3>
+  <h3>📋 Manual QR Text Input</h3>
   <textarea id="manualInput" placeholder="Paste QR text here..." rows="5" cols="40"></textarea><br>
   <button onclick="submitManualInput()">📤 Submit Attendance</button>
 
   <script>
-    const sheetWebhookURL = "https://script.google.com/macros/s/AKfycbzbdgtEjSDtc3SstJKi289qRr94What-aHKeaNURhn04aUngo_DQ28jCxSjQUZ_HCbEMg/exec";
+    const sheetWebhookURL = "YOUR_SCRIPT_WEB_APP_URL"; // Replace this
+
     const html5QrCode = new Html5Qrcode("reader");
     let videoTrack = null;
+    let currentData = null;
 
-    function sendToSheet(data, isManual = false) {
-      fetch(sheetWebhookURL, {
-        method: "POST",
-        body: data,
-        headers: { "Content-Type": "text/plain" }
-      })
-      .then(res => res.text())
-      .then(msg => {
-        document.getElementById("status").innerText = isManual ? "✅ Manual attendance sent!" : "✅ Attendance logged!";
-        setTimeout(() => {
-          document.getElementById("status").innerText = "Waiting for scan...";
-          document.getElementById("scannedText").innerText = "No scan yet...";
-        }, 4000);
-      })
-      .catch(() => {
-        document.getElementById("status").innerText = "❌ Failed to send attendance";
-      });
+    function formatTime(date) {
+      let hours = date.getHours();
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      return `${hours}:${minutes} ${ampm}`;
+    }
+
+    function parseStudentData(raw) {
+      try {
+        const studentId = raw.substring(0, 16).trim();
+        const nameStart = 16;
+        const collegeIndex = raw.indexOf("COLLEGE OF");
+        const name = raw.substring(nameStart, collegeIndex).trim();
+
+        const collegeStart = collegeIndex;
+        const courseIndex = raw.indexOf("BS", collegeStart);
+        const college = raw.substring(collegeStart, courseIndex).trim();
+
+        const birthdayMatch = raw.match(/(\d{2}\/\d{2}\/\d{4})/);
+        const birthday = birthdayMatch ? birthdayMatch[0] : "N/A";
+
+        const course = raw.substring(courseIndex, raw.indexOf(birthday)).trim();
+
+        const phoneMatch = raw.match(/(09\d{9})/);
+        const phone = phoneMatch ? phoneMatch[0] : "N/A";
+
+        const addressStart = raw.indexOf(birthday) + birthday.length;
+        const addressEnd = raw.indexOf(phone);
+        const address = raw.substring(addressStart, addressEnd).trim();
+
+        const date = new Date();
+        return {
+          studentId, name, college, course,
+          birthday, address, phone,
+          date: date.toISOString().split("T")[0],
+          time: formatTime(date)
+        };
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function showPreview(data) {
+      document.getElementById("preview").innerText =
+        `Student ID: ${data.studentId}\nName: ${data.name}\nCollege: ${data.college}\nCourse: ${data.course}\nBirthday: ${data.birthday}\nAddress: ${data.address}\nPhone: ${data.phone}`;
+      document.getElementById("confirmBtn").disabled = false;
     }
 
     function onScanSuccess(decodedText) {
-      document.getElementById("scannedText").innerText = decodedText;
-      sendToSheet(decodedText);
+      const parsed = parseStudentData(decodedText);
+      if (!parsed) {
+        document.getElementById("status").innerText = "❌ Failed to parse QR data.";
+        return;
+      }
+      currentData = parsed;
+      showPreview(parsed);
+      document.getElementById("status").innerText = "✅ QR scanned. Select year level & confirm.";
+    }
+
+    function submitAttendance() {
+      const year = document.getElementById("yearLevel").value;
+      if (!year || !currentData) {
+        alert("Please select a year level and scan a valid QR.");
+        return;
+      }
+      const payload = JSON.stringify({ ...currentData, yearLevel: year });
+      fetch(sheetWebhookURL, {
+        method: "POST",
+        body: payload,
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.text())
+      .then(msg => {
+        document.getElementById("status").innerText = msg;
+        document.getElementById("preview").innerText = "No scan yet...";
+        document.getElementById("confirmBtn").disabled = true;
+        document.getElementById("yearLevel").value = "";
+        currentData = null;
+      });
     }
 
     function submitManualInput() {
-      const data = document.getElementById("manualInput").value.trim();
-      if (!data) {
+      const raw = document.getElementById("manualInput").value.trim();
+      if (!raw) {
         alert("⚠️ Please paste QR text first.");
         return;
       }
-      sendToSheet(data, true);
-      document.getElementById("manualInput").value = "";
+      onScanSuccess(raw);
     }
 
-    // Start scanner and configure zoom if available
     async function startScanner() {
       const devices = await Html5Qrcode.getCameras();
-      if (devices && devices.length) {
-        const cameraId = devices[0].id;
+      if (devices.length) {
+        const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
         await html5QrCode.start(
-          { deviceId: { exact: cameraId } },
+          { deviceId: { exact: backCam.id } },
           { fps: 10, qrbox: 250 },
           onScanSuccess
         ).then(() => {
-          // Wait a moment then access the video stream safely
           setTimeout(() => {
             const video = document.querySelector("video");
             if (video && video.srcObject) {
@@ -125,7 +192,7 @@
                 };
               }
             }
-          }, 1000); // Wait to ensure video is ready
+          }, 1000);
         });
       } else {
         document.getElementById("status").innerText = "❌ No camera found.";
