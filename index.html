@@ -98,7 +98,7 @@
 
     const course = raw.substring(courseIndex, raw.indexOf(birthday)).trim();
 
-    const phoneMatches = raw.match(/(09\d{9})/g); // Get all 11-digit phones
+    const phoneMatches = raw.match(/(09\d{9})/g); // Find all valid phones
     const phone = phoneMatches && phoneMatches.length > 0 ? phoneMatches[0] : "N/A";
 
     const addressStart = raw.indexOf(birthday) + birthday.length;
@@ -122,6 +122,7 @@
     return null;
   }
 }
+
 
 
     function showPreview(data) {
