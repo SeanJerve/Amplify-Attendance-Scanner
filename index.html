@@ -7,14 +7,29 @@
   <style>
     body { font-family: Arial; text-align: center; padding: 20px; }
     #reader { width: 300px; margin: 20px auto; }
-    #scannedText, #manualInput { background: #f0f0f0; padding: 10px; border: 1px solid #ccc; max-width: 300px; margin: 10px auto; word-wrap: break-word; }
+    #scannedText, #manualInput {
+      background: #f0f0f0; padding: 10px; border: 1px solid #ccc;
+      max-width: 300px; margin: 10px auto; word-wrap: break-word;
+    }
     select, button { padding: 8px 16px; margin: 5px; }
     #status { font-weight: bold; color: green; }
+    #popup {
+      display: none; background: #fff; border: 2px solid #000;
+      padding: 20px; position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); z-index: 9999; box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    #overlay {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+      z-index: 9998;
+    }
   </style>
 </head>
 <body>
   <h2>📸 QR Attendance Scanner</h2>
   <div id="reader"></div>
+  <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
+
   <pre id="scannedText">No scan yet...</pre>
 
   <label for="yearLevel">Select Year Level:</label>
@@ -34,9 +49,17 @@
   <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40"></textarea><br>
   <button onclick="submitManualInput()">📤 Submit Manual</button>
 
+  <div id="overlay"></div>
+  <div id="popup">
+    <h3>Student Info</h3>
+    <pre id="popupContent"></pre>
+    <button onclick="closePopup()">✅ OK</button>
+  </div>
+
   <script>
     const endpoint = "https://script.google.com/macros/s/AKfycbxf-xBgYbyQDA6VbGxdbRzHt6UWJSP3jACxYct3vJHbvexSs_0NhZFGd0_QCITZRblh/exec";
     const scanner = new Html5Qrcode("reader");
+    let videoTrack = null;
     let lastScanned = "";
 
     function sendToScript(data) {
@@ -58,6 +81,7 @@
       const yearLevel = document.getElementById("yearLevel").value;
       if (!lastScanned || !yearLevel) return alert("Scan a code and select year level.");
       sendToScript(`${lastScanned}|YEARLEVEL=${yearLevel}`);
+      closePopup();
     }
 
     function submitManualInput() {
@@ -73,26 +97,58 @@
       document.getElementById("scannedText").innerText = decodedText;
       document.getElementById("submitBtn").disabled = false;
       document.getElementById("status").innerText = "✅ QR scanned. Select year level.";
+      showPopup(decodedText);
+    }
+
+    function showPopup(text) {
+      document.getElementById("popupContent").innerText = text;
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
     }
 
     Html5Qrcode.getCameras().then(devices => {
-  if (devices.length) {
-    // Try to find a back-facing camera
-    const backCam = devices.find(device =>
-      device.label.toLowerCase().includes("back") ||
-      device.label.toLowerCase().includes("rear")
-    ) || devices[0]; // fallback to first camera
+      if (devices.length) {
+        const backCam = devices.find(device =>
+          device.label.toLowerCase().includes("back") ||
+          device.label.toLowerCase().includes("rear")
+        ) || devices[0];
 
-    scanner.start(
-      { deviceId: { exact: backCam.id } },
-      { fps: 10, qrbox: 250 },
-      onScanSuccess
-    );
-  } else {
-    document.getElementById("status").innerText = "❌ No camera found.";
-  }
-});
+        scanner.start(
+          { deviceId: { exact: backCam.id } },
+          { fps: 10, qrbox: 250 },
+          onScanSuccess
+        ).then(() => enableZoomControl());
+      } else {
+        document.getElementById("status").innerText = "❌ No camera found.";
+      }
+    });
 
+    function enableZoomControl() {
+      setTimeout(() => {
+        const video = document.querySelector("video");
+        if (video && video.srcObject) {
+          videoTrack = video.srcObject.getVideoTracks()[0];
+          const caps = videoTrack.getCapabilities?.();
+          const slider = document.getElementById("zoomSlider");
+
+          if (caps && caps.zoom) {
+            slider.min = caps.zoom.min;
+            slider.max = caps.zoom.max;
+            slider.step = caps.zoom.step || 0.1;
+            slider.value = caps.zoom.min;
+            slider.disabled = false;
+            slider.oninput = () => {
+              videoTrack.applyConstraints({ advanced: [{ zoom: parseFloat(slider.value) }] });
+            };
+          }
+        }
+      }, 1000);
+    }
   </script>
 </body>
 </html>
