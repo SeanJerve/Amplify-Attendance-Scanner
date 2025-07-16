@@ -76,10 +76,23 @@
     }
 
     Html5Qrcode.getCameras().then(devices => {
-      if (devices.length) {
-        scanner.start({ deviceId: { exact: devices[0].id } }, { fps: 10, qrbox: 250 }, onScanSuccess);
-      }
-    });
+  if (devices.length) {
+    // Try to find a back-facing camera
+    const backCam = devices.find(device =>
+      device.label.toLowerCase().includes("back") ||
+      device.label.toLowerCase().includes("rear")
+    ) || devices[0]; // fallback to first camera
+
+    scanner.start(
+      { deviceId: { exact: backCam.id } },
+      { fps: 10, qrbox: 250 },
+      onScanSuccess
+    );
+  } else {
+    document.getElementById("status").innerText = "❌ No camera found.";
+  }
+});
+
   </script>
 </body>
 </html>
