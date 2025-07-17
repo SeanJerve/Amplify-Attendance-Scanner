@@ -40,14 +40,14 @@
     <option value="3rd Year">3rd Year</option>
     <option value="4th Year">4th Year</option>
   </select><br>
+
   <button onclick="submitAttendance()" id="submitBtn" disabled>📤 Confirm & Send</button>
 
-  <p id="status">Waiting for scan...</p>
+  <p id="status">Waiting for scan or input...</p>
 
   <hr>
   <h3>📋 Manual Input</h3>
-  <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40"></textarea><br>
-  <button onclick="submitManualInput()">📤 Submit Manual</button>
+  <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40" oninput="checkInputs()"></textarea>
 
   <div id="overlay"></div>
   <div id="popup">
@@ -72,6 +72,8 @@
           document.getElementById("status").innerText = msg;
           document.getElementById("submitBtn").disabled = true;
           document.getElementById("scannedText").innerText = "No scan yet...";
+          document.getElementById("manualInput").value = "";
+          lastScanned = "";
         }).catch(() => {
           document.getElementById("status").innerText = "❌ Failed to send";
         });
@@ -79,24 +81,26 @@
 
     function submitAttendance() {
       const yearLevel = document.getElementById("yearLevel").value;
-      if (!lastScanned || !yearLevel) return alert("Scan a code and select year level.");
-      sendToScript(`${lastScanned}|YEARLEVEL=${yearLevel}`);
-      closePopup();
-    }
+      const manualInput = document.getElementById("manualInput").value.trim();
 
-    function submitManualInput() {
-      const text = document.getElementById("manualInput").value.trim();
-      const yearLevel = document.getElementById("yearLevel").value;
-      if (!text || !yearLevel) return alert("Provide data + year level.");
-      sendToScript(`${text}|YEARLEVEL=${yearLevel}`);
-      document.getElementById("manualInput").value = "";
+      if (!yearLevel) return alert("Please select year level.");
+
+      if (manualInput) {
+        sendToScript(`${manualInput}|YEARLEVEL=${yearLevel}`);
+      } else if (lastScanned) {
+        sendToScript(`${lastScanned}|YEARLEVEL=${yearLevel}`);
+      } else {
+        return alert("No scanned or manual data found.");
+      }
+
+      closePopup();
     }
 
     function onScanSuccess(decodedText) {
       lastScanned = decodedText;
       document.getElementById("scannedText").innerText = decodedText;
-      document.getElementById("submitBtn").disabled = false;
       document.getElementById("status").innerText = "✅ QR scanned. Select year level.";
+      checkInputs();
       showPopup(decodedText);
     }
 
@@ -109,6 +113,12 @@
     function closePopup() {
       document.getElementById("popup").style.display = "none";
       document.getElementById("overlay").style.display = "none";
+    }
+
+    function checkInputs() {
+      const manualInput = document.getElementById("manualInput").value.trim();
+      const enable = manualInput || lastScanned;
+      document.getElementById("submitBtn").disabled = !enable;
     }
 
     Html5Qrcode.getCameras().then(devices => {
