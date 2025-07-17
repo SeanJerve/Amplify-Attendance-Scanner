@@ -93,21 +93,42 @@
     }
 
     function submitAttendance() {
-      const yearLevel = document.getElementById("yearLevel").value;
-      const manualInput = document.getElementById("manualInput").value.trim();
+  const yearLevel = document.getElementById("yearLevel").value;
+  const manualInput = document.getElementById("manualInput").value.trim();
+  const statusEl = document.getElementById("status");
+  const submitBtn = document.getElementById("submitBtn");
 
-      if (!yearLevel) return alert("Please select year level.");
+  if (!yearLevel) return alert("Please select year level.");
 
-      if (manualInput) {
-        sendToScript(`${manualInput}|YEARLEVEL=${yearLevel}`);
-      } else if (lastScanned) {
-        sendToScript(`${lastScanned}|YEARLEVEL=${yearLevel}`);
-      } else {
-        return alert("No scanned or manual data found.");
-      }
+  statusEl.innerText = "⏳ Sending...";
+  submitBtn.disabled = true;
 
-      closePopup();
-    }
+  const payload = manualInput
+    ? `${manualInput}|YEARLEVEL=${yearLevel}`
+    : lastScanned
+      ? `${lastScanned}|YEARLEVEL=${yearLevel}`
+      : null;
+
+  if (!payload) return alert("No scanned or manual data found.");
+
+  fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: payload
+  }).then(res => res.text())
+    .then(msg => {
+      statusEl.innerText = msg;
+      submitBtn.disabled = true;
+      document.getElementById("scannedText").innerText = "No scan yet...";
+      document.getElementById("manualInput").value = "";
+      lastScanned = "";
+    }).catch(() => {
+      statusEl.innerText = "❌ Failed to send";
+    });
+
+  closePopup();
+}
+
 
     function onScanSuccess(decodedText) {
       lastScanned = decodedText;
