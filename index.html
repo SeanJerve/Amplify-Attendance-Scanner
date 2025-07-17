@@ -1,182 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>QR Attendance Scanner</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <title>QR Attendance System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
-    #reader { width: 300px; margin: 20px auto; }
-    #scannedText, #manualInput {
-      background: #f0f0f0; padding: 10px; border: 1px solid #ccc;
-      max-width: 300px; margin: 10px auto; word-wrap: break-word;
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
     }
-    select, button { padding: 8px 16px; margin: 5px; }
-    #status { font-weight: bold; color: green; }
+
+    video {
+      width: 100%;
+      max-width: 400px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    select, input, button {
+      padding: 10px;
+      margin: 10px 5px;
+      font-size: 1em;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: green;
+    }
+
     #popup {
-      display: none; background: #fff; border: 2px solid #000;
-      padding: 20px; position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); z-index: 9999; box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
     }
-    #overlay {
-      display: none; position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%; background: rgba(0,0,0,0.5);
-      z-index: 9998;
+
+    #popupContent {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 1.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
-  <h2>📸 QR Attendance Scanner</h2>
-  <div id="reader"></div>
-  <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
+  <h1>QR Attendance System</h1>
 
-  <pre id="scannedText">No scan yet...</pre>
+  <video id="preview"></video>
 
-  <label for="yearLevel">Select Year Level:</label>
-  <select id="yearLevel">
-    <option value="">-- Select --</option>
-    <option value="1st Year">1st Year</option>
-    <option value="2nd Year">2nd Year</option>
-    <option value="3rd Year">3rd Year</option>
-    <option value="4th Year">4th Year</option>
-  </select><br>
-
-  <button onclick="submitAttendance()" id="submitBtn" disabled>📤 Confirm & Send</button>
-
-  <p id="status">Waiting for scan or input...</p>
-
-  <hr>
-  <h3>📋 Manual Input</h3>
-  <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40" oninput="checkInputs()"></textarea>
-
-  <div id="overlay"></div>
-  <div id="popup">
-    <h3>Student Info</h3>
-    <pre id="popupContent"></pre>
-    <button onclick="closePopup()">✅ OK</button>
+  <div>
+    <label for="yearLevel">Year Level:</label>
+    <select id="yearLevel">
+      <option value="">-- Select Year Level --</option>
+      <option value="1st Year">1st Year</option>
+      <option value="2nd Year">2nd Year</option>
+      <option value="3rd Year">3rd Year</option>
+      <option value="4th Year">4th Year</option>
+    </select>
   </div>
 
-<!-- Loading Overlay -->
-<div id="loadingOverlay" style="display:none;
-  position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.6); z-index:9999;
-  display:flex; justify-content:center; align-items:center;
-  color:white; font-size:1.5em;">
-  ⏳ Sending attendance... Please wait.
-</div>
+  <div>
+    <label for="manualInput">Manual Entry (optional):</label><br>
+    <input type="text" id="manualInput" placeholder="Paste QR content">
+  </div>
 
+  <div>
+    <button onclick="submitAttendance()" id="submitBtn">Submit Attendance</button>
+  </div>
 
+  <div id="scannedText">No scan yet...</div>
+  <div id="status"></div>
+
+  <!-- Confirmation Popup -->
+  <div id="popup">
+    <div id="popupContent">
+      <p>✅ Attendance recorded!</p>
+      <button onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay">⏳ Sending attendance... Please wait.</div>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
-    const endpoint = "https://script.google.com/macros/s/AKfycbwFoXBZgbfPetdZq4HLGjiedW7bly9OG2zn5Nj_rgsTwunGU0B-YpwSSV6Cgn3vNWnK/exec";
-    const scanner = new Html5Qrcode("reader");
-    let videoTrack = null;
+    const endpoint = "https://script.google.com/macros/s/AKfycbwFoXBZgbfPetdZq4HLGjiedW7bly9OG2zn5Nj_rgsTwunGU0B-YpwSSV6Cgn3vNWnK/exec"; 
     let lastScanned = "";
 
-   function sendToScript(data) {
-  document.getElementById("loadingOverlay").style.display = "flex";
-  fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: data
-  }).then(res => res.text())
-    .then(msg => {
-      document.getElementById("status").innerText = msg;
-      document.getElementById("submitBtn").disabled = true;
-      document.getElementById("scannedText").innerText = "No scan yet...";
-      document.getElementById("manualInput").value = "";
-      lastScanned = "";
-    }).catch(() => {
-      document.getElementById("status").innerText = "❌ Failed to send";
-    }).finally(() => {
-      document.getElementById("loadingOverlay").style.display = "none";
-    });
-}
-
-function submitAttendance() {
-  const yearLevel = document.getElementById("yearLevel").value;
-  const manualInput = document.getElementById("manualInput").value.trim();
-
-  if (!yearLevel) return alert("Please select year level.");
-
-  document.getElementById("submitBtn").disabled = true;
-
-  if (manualInput) {
-    sendToScript(`${manualInput}|YEARLEVEL=${yearLevel}`);
-  } else if (lastScanned) {
-    sendToScript(`${lastScanned}|YEARLEVEL=${yearLevel}`);
-  } else {
-    alert("No scanned or manual data found.");
-    document.getElementById("submitBtn").disabled = false;
-    return;
-  }
-
-  closePopup();
-}
-
-
-    function onScanSuccess(decodedText) {
-      lastScanned = decodedText;
-      document.getElementById("scannedText").innerText = decodedText;
-      document.getElementById("status").innerText = "✅ QR scanned. Select year level.";
-      checkInputs();
-      showPopup(decodedText);
-    }
-
-    function showPopup(text) {
-      document.getElementById("popupContent").innerText = text;
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("popup").style.display = "block";
+    function showPopup() {
+      document.getElementById("popup").style.display = "flex";
     }
 
     function closePopup() {
       document.getElementById("popup").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
     }
 
-    function checkInputs() {
+    function sendToScript(data) {
+      document.getElementById("loadingOverlay").style.display = "flex";
+
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: data
+      }).then(res => res.text())
+        .then(msg => {
+          document.getElementById("status").innerText = msg;
+          document.getElementById("submitBtn").disabled = true;
+          document.getElementById("scannedText").innerText = "No scan yet...";
+          document.getElementById("manualInput").value = "";
+          lastScanned = "";
+        }).catch(() => {
+          document.getElementById("status").innerText = "❌ Failed to send";
+        }).finally(() => {
+          document.getElementById("loadingOverlay").style.display = "none";
+        });
+    }
+
+    function submitAttendance() {
+      const yearLevel = document.getElementById("yearLevel").value;
       const manualInput = document.getElementById("manualInput").value.trim();
-      const enable = manualInput || lastScanned;
-      document.getElementById("submitBtn").disabled = !enable;
-    }
 
-    Html5Qrcode.getCameras().then(devices => {
-      if (devices.length) {
-        const backCam = devices.find(device =>
-          device.label.toLowerCase().includes("back") ||
-          device.label.toLowerCase().includes("rear")
-        ) || devices[0];
+      if (!yearLevel) return alert("Please select year level.");
 
-        scanner.start(
-          { deviceId: { exact: backCam.id } },
-          { fps: 10, qrbox: 250 },
-          onScanSuccess
-        ).then(() => enableZoomControl());
+      document.getElementById("submitBtn").disabled = true;
+
+      if (manualInput) {
+        sendToScript(`${manualInput}|YEARLEVEL=${yearLevel}`);
+      } else if (lastScanned) {
+        sendToScript(`${lastScanned}|YEARLEVEL=${yearLevel}`);
       } else {
-        document.getElementById("status").innerText = "❌ No camera found.";
+        alert("No scanned or manual data found.");
+        document.getElementById("submitBtn").disabled = false;
+        return;
       }
-    });
 
-    function enableZoomControl() {
-      setTimeout(() => {
-        const video = document.querySelector("video");
-        if (video && video.srcObject) {
-          videoTrack = video.srcObject.getVideoTracks()[0];
-          const caps = videoTrack.getCapabilities?.();
-          const slider = document.getElementById("zoomSlider");
-
-          if (caps && caps.zoom) {
-            slider.min = caps.zoom.min;
-            slider.max = caps.zoom.max;
-            slider.step = caps.zoom.step || 0.1;
-            slider.value = caps.zoom.min;
-            slider.disabled = false;
-            slider.oninput = () => {
-              videoTrack.applyConstraints({ advanced: [{ zoom: parseFloat(slider.value) }] });
-            };
-          }
-        }
-      }, 1000);
+      showPopup();
     }
+
+    const qrScanner = new Html5Qrcode("preview");
+    const config = { fps: 10, qrbox: 250 };
+
+    function startScanning() {
+      qrScanner.start({ facingMode: "environment" }, config, qrCodeMessage => {
+        if (qrCodeMessage !== lastScanned) {
+          lastScanned = qrCodeMessage;
+          document.getElementById("scannedText").innerText = `Scanned: ${qrCodeMessage}`;
+          document.getElementById("submitBtn").disabled = false;
+        }
+      });
+    }
+
+    startScanning();
   </script>
 </body>
 </html>
