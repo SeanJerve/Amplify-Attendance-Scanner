@@ -89,7 +89,7 @@
   </div>
 
   <div>
-    <button onclick="submitAttendance()" id="submitBtn">Submit Attendance</button>
+    <button onclick="submitAttendance()" id="Btn">Attendance</button>
   </div>
 
   <div id="scannedText">No scan yet...</div>
@@ -119,46 +119,50 @@
       document.getElementById("popup").style.display = "none";
     }
 
-    function sendToScript(data) {
+    function submitAttendance() {
+      const yearLevel = document.getElementById("yearLevel").value;
+      const manualInput = document.getElementById("manualInput").value.trim();
+      const submitBtn = document.getElementById("Btn");
+
+      if (!yearLevel) {
+        alert("Please select year level.");
+        return;
+      }
+
+      let dataToSend = "";
+
+      if (manualInput) {
+        dataToSend = `${manualInput}|YEARLEVEL=${yearLevel}`;
+      } else if (lastScanned) {
+        dataToSend = `${lastScanned}|YEARLEVEL=${yearLevel}`;
+      } else {
+        alert("No scanned or manual data found.");
+        return;
+      }
+
+      submitBtn.disabled = true;
       document.getElementById("loadingOverlay").style.display = "flex";
 
       fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
-        body: data
-      }).then(res => res.text())
-        .then(msg => {
-          document.getElementById("status").innerText = msg;
-          document.getElementById("submitBtn").disabled = true;
-          document.getElementById("scannedText").innerText = "No scan yet...";
-          document.getElementById("manualInput").value = "";
-          lastScanned = "";
-        }).catch(() => {
-          document.getElementById("status").innerText = "❌ Failed to send";
-        }).finally(() => {
-          document.getElementById("loadingOverlay").style.display = "none";
-        });
-    }
-
-    function submitAttendance() {
-      const yearLevel = document.getElementById("yearLevel").value;
-      const manualInput = document.getElementById("manualInput").value.trim();
-
-      if (!yearLevel) return alert("Please select year level.");
-
-      document.getElementById("submitBtn").disabled = true;
-
-      if (manualInput) {
-        sendToScript(`${manualInput}|YEARLEVEL=${yearLevel}`);
-      } else if (lastScanned) {
-        sendToScript(`${lastScanned}|YEARLEVEL=${yearLevel}`);
-      } else {
-        alert("No scanned or manual data found.");
-        document.getElementById("submitBtn").disabled = false;
-        return;
-      }
-
-      showPopup();
+        body: dataToSend
+      })
+      .then(res => res.text())
+      .then(msg => {
+        document.getElementById("status").innerText = msg;
+        document.getElementById("scannedText").innerText = "No scan yet...";
+        document.getElementById("manualInput").value = "";
+        lastScanned = "";
+        showPopup();
+      })
+      .catch(() => {
+        document.getElementById("status").innerText = "❌ Failed to send";
+      })
+      .finally(() => {
+        document.getElementById("loadingOverlay").style.display = "none";
+        submitBtn.disabled = false;
+      });
     }
 
     const qrScanner = new Html5Qrcode("preview");
@@ -169,7 +173,7 @@
         if (qrCodeMessage !== lastScanned) {
           lastScanned = qrCodeMessage;
           document.getElementById("scannedText").innerText = `Scanned: ${qrCodeMessage}`;
-          document.getElementById("submitBtn").disabled = false;
+          document.getElementById("Btn").disabled = false;
         }
       });
     }
