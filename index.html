@@ -201,7 +201,8 @@
             color: var(--input-text-color); /* Apply text color */
         }
 
-        .control-navbar {
+        /* Specific styling for the control section (label, select, button) */
+        .control-section { /* Changed from .control-navbar to .control-section for better semantic clarity */
             display: flex; /* Ensure flexbox for internal layout */
             flex-direction: column;
             gap: var(--spacing-sm); /* Smaller gap for internal elements */
@@ -282,14 +283,16 @@
             appearance: none; /* Remove default browser styling */
             -webkit-appearance: none;
             -moz-appearance: none;
-            background: var(--glass-background); /* Apply glass background */
-            border: 2px solid var(--glass-border); /* Apply glass border */
-            border-radius: var(--border-radius); /* Apply glass border-radius */
+            
+            /* Apply glass container styles directly */
+            background: var(--glass-background); /* Explicitly set for textarea */
+            border: 2px solid var(--glass-border); /* Explicitly set for textarea */
+            border-radius: var(--border-radius); /* Explicitly set for textarea */
             box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.15), /* Apply glass shadows */
+                0 15px 35px rgba(0, 0, 0, 0.15), /* Explicitly set for textarea */
                 0 5px 15px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(var(--glass-blur)); /* Apply blur */
+            backdrop-filter: blur(var(--glass-blur)); /* Explicitly set for textarea */
             -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
             
             margin-top: var(--spacing-sm); /* Adjust top margin for manual input */
@@ -306,20 +309,9 @@
         }
 
         /* Ensure the :before and :after pseudo-elements also apply to textarea */
-        textarea.glass-container::before,
-        textarea.glass-container::after {
+        textarea.glass-container::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Allows clicks through */
-            border-radius: var(--border-radius); /* Match textarea border-radius */
-            z-index: -1; /* For :before, behind the main element */
-        }
-
-        textarea.glass-container::before {
             top: -2px;
             left: -2px;
             right: -2px;
@@ -329,14 +321,23 @@
                 transparent, 
                 var(--color-cyan)
             );
+            border-radius: var(--border-radius); /* Match textarea border-radius */
+            z-index: -1; /* Behind the main element */
             opacity: 0.8;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         textarea.glass-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
             background: rgba(255, 255, 255, 0.3); /* White shine color */
             transform: skewX(-30deg);
             transition: all 0.5s ease;
+            pointer-events: none; /* Allows clicks through */
         }
 
         textarea.glass-container:hover {
@@ -554,7 +555,7 @@
                 width: calc(100% - var(--spacing-md));
             }
 
-            .control-navbar {
+            .control-section { /* Renamed for consistency */
                 gap: var(--spacing-xs); 
             }
 
@@ -650,42 +651,41 @@
     </style>
 </head>
 <body>
-    <h2>QR Attendance Scanner</h2>
+    <h2>📸 QR Attendance Scanner</h2>
     <div id="reader" class="glass-container"></div>
     <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
 
     <pre id="scannedText" class="glass-container">No scan yet...</pre>
 
-    <div class="control-navbar glass-container">
+    <div class="control-section glass-container">
         <label for="yearLevel">Select Year Level:</label>
         <select id="yearLevel">
-            <option value="">Select</option>
+            <option value="">-- Select --</option>
             <option value="1st Year">1st Year</option>
             <option value="2nd Year">2nd Year</option>
             <option value="3rd Year">3rd Year</option>
             <option value="4th Year">4th Year</option>
         </select>
-
-        <button onclick="submitAttendance()" id="submitBtn" disabled>Confirm & Send</button>
+        <button onclick="submitAttendance()" id="submitBtn" disabled>📤 Confirm & Send</button>
     </div>
 
     <p id="status" class="glass-container">Waiting for scan or input...</p>
 
     <hr>
-    <h3>Manual Input</h3>
+    <h3>📋 Manual Input</h3>
     <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
 
     <div id="overlay"></div>
     <div id="popup">
         <h3>Student Info</h3>
         <pre id="popupContent"></pre>
-        <button onclick="closePopup()">OK</button>
+        <button onclick="closePopup()">✅ OK</button>
     </div>
 
     <div id="loading">⏳ Sending attendance... Please wait.</div>
 
     <script>
-        const endpoint = "https://script.google.com/macros/s/AKfycbxge50iCgqrEm-1LsAIjZ2Dft7A1DFTLO1mt0doNeLV1dVYYde2OHL2xV1sYDE2OHL2xV1sYDE2OHL2xV1s/exec"; // Placeholder URL, replace with your actual URL
+        const endpoint = "https://script.google.com/macros/s/AKfycbxge50iCgqrEm-1LsAIjZ2Dft7A1DFTLO1mt0doNeLV1dVYYde2OHaL-JxjhshfL0FF/exec";
         const scanner = new Html5Qrcode("reader");
         let videoTrack = null;
         let lastScanned = "";
@@ -705,7 +705,7 @@
                     document.getElementById("manualInput").value = "";
                     lastScanned = "";
                 }).catch(() => {
-                    document.getElementById("status").innerText = "Failed to send";
+                    document.getElementById("status").innerText = "❌ Failed to send";
                 }).finally(() => {
                     document.getElementById("loading").style.display = "none";
                 });
@@ -766,23 +766,28 @@
         }
 
         function showPopup(text) {
+            // Updated to use classlist for animation control
             const popup = document.getElementById("popup");
             const overlay = document.getElementById("overlay");
             document.getElementById("popupContent").innerText = text;
             overlay.classList.add("show");
             popup.classList.add("show");
+            // Ensure display:block immediately for interaction, then hide after animation
+            popup.style.display = "block"; 
+            overlay.style.display = "block";
         }
 
         function closePopup() {
+            // Updated to use classlist for animation control
             const popup = document.getElementById("popup");
             const overlay = document.getElementById("overlay");
             popup.classList.remove("show");
             overlay.classList.remove("show");
-            // Give a slight delay for the animation to finish before hiding completely
+            // Add a slight delay for the animation to finish before truly hiding the element
             setTimeout(() => {
                 popup.style.display = "none";
                 overlay.style.display = "none";
-            }, 400); 
+            }, 400); // This duration should match your CSS transition duration for the popup
         }
 
         function checkInputs() {
