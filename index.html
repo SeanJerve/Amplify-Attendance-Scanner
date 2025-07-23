@@ -1,214 +1,834 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>QR Attendance Scanner</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
-    #reader { width: 300px; margin: 20px auto; }
-    #scannedText, #manualInput {
-      background: #f0f0f0; padding: 10px; border: 1px solid #ccc;
-      max-width: 300px; margin: 10px auto; word-wrap: break-word;
-    }
-    select, button { padding: 8px 16px; margin: 5px; }
-    #status { font-weight: bold; color: green; }
+    <meta charset="UTF-8">
+    <title>QR Attendance Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        /* Modern CSS Custom Properties - Dark on White Glass */
+        :root {
+            --color-white: #ffffff;
+            --color-light-gray: #e9ecef;
+            --color-dark-navy: #0C111D;
+            --color-deep-blue: #1a1f2e;
+            --color-cyan: #00DCFD;
+            --color-black: #000000;
+            
+            --font-primary: 'Arial Black', Arial, sans-serif;
+            --font-secondary: 'Arial', sans-serif;
+            
+            --border-radius: 20px;
+            --glass-blur: 25px; /* Increased blur for more prominent glass effect */
+            --glass-background: rgba(255, 255, 255, 0.15); /* Lighter background for white theme */
+            --glass-border: rgba(255, 255, 255, 0.4); /* Lighter border for white theme */
+            --text-color: var(--color-dark-navy); /* Default text color for dark-on-white */
+            --heading-shadow-color: rgba(0, 0, 0, 0.15); /* Softer shadow for headings */
+            --button-text-color: var(--color-white); /* White text on dark buttons */
+            --button-background: var(--color-deep-blue); /* Darker button background */
+            --button-hover-background: var(--color-dark-navy);
+            --input-background: var(--color-white);
+            --input-border: var(--color-medium-blue);
+            --input-text-color: var(--color-dark-navy);
 
-    #popup {
-      display: none; background: #fff; border: 2px solid #000;
-      padding: 20px; position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); z-index: 9999; box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    }
-    #overlay {
-      display: none; position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%; background: rgba(0,0,0,0.5);
-      z-index: 9998;
-    }
-    #loading {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  z-index: 9999;
-  color: white; font-size: 20px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
+            /* Spacing Custom Properties */
+            --spacing-xs: 5px; /* Extra small spacing */
+            --spacing-sm: 10px;
+            --spacing-md: 15px; /* Slightly reduced default medium spacing */
+            --spacing-lg: 25px; /* Slightly reduced default large spacing */
+            --container-padding: 18px; /* Slightly reduced default padding for glass containers */
+        }
 
-  </style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: var(--font-secondary); 
+            text-align: center; 
+            padding: var(--spacing-md); /* Use spacing variable */
+            background: linear-gradient(135deg, var(--color-white), var(--color-light-gray)); /* White background gradient */
+            color: var(--text-color); /* Default text color */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Align items to the start for better flow on small screens */
+            gap: var(--spacing-md); /* Add gap for consistent spacing between main elements */
+        }
+
+        h2 {
+            color: var(--color-dark-navy); /* Darker heading color */
+            font-family: var(--font-primary);
+            margin-bottom: var(--spacing-md); /* Use spacing variable */
+            text-shadow: 0 0 15px var(--heading-shadow-color);
+            font-size: 2.2rem;
+        }
+
+        h3 {
+            color: var(--color-dark-navy); /* Darker heading color */
+            font-family: var(--font-primary);
+            margin: var(--spacing-md) 0 var(--spacing-sm) 0; /* Use spacing variables */
+            text-shadow: 0 0 10px var(--heading-shadow-color);
+        }
+
+        /* --- Global Glassmorphism Container Style --- */
+        .glass-container {
+            position: relative;
+            background: var(--glass-background); /* White glass background */
+            border: 2px solid var(--glass-border); /* White glass border */
+            border-radius: var(--border-radius);
+            padding: var(--container-padding); /* Use container padding variable */
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.15), /* Softer shadow */
+                0 5px 15px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8); /* Stronger inner highlight */
+            backdrop-filter: blur(var(--glass-blur)); /* Apply blur */
+            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
+            overflow: hidden; /* For gradient border effect and shine */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth transitions */
+            margin: 0 auto; /* Center individual containers */
+            width: clamp(280px, 90vw, 400px); /* Responsive width applied globally here */
+        }
+
+        .glass-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--color-cyan), 
+                transparent, 
+                var(--color-cyan)
+            );
+            border-radius: var(--border-radius); /* Match container border-radius */
+            z-index: -1;
+            opacity: 0.8; /* Always visible */
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        /* Shine animation on hover */
+        .glass-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3); /* White shine color */
+            transform: skewX(-30deg);
+            transition: all 0.5s ease;
+            pointer-events: none; /* Allows clicks through the shine */
+        }
+
+        .glass-container:hover {
+            transform: translateY(-3px) scale(1.02); /* Slight scale on hover */
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.25), /* Stronger shadow on hover */
+                0 8px 20px rgba(0, 220, 253, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-container:hover::after {
+            left: 100%; /* Move shine across */
+        }
+        /* --- End Global Glassmorphism Container Style --- */
+
+
+        #reader { 
+            /* Inherits most styles from .glass-container */
+            width: clamp(250px, 80vw, 350px); /* Responsive width for reader */
+            margin-bottom: var(--spacing-md); /* Specific margin for reader */
+            overflow: hidden; /* Important for camera feed */
+            box-shadow: /* Retain specific box-shadow for camera as it's animated */
+                0 0 30px rgba(0, 0, 0, 0.1),
+                0 15px 35px rgba(0, 0, 0, 0.2);
+            animation: glow 3s ease-in-out infinite;
+            position: relative;
+            background-color: var(--color-black); /* Ensure a solid background for video */
+            display: flex; /* Make it a flex container for centering video */
+            justify-content: center;
+            align-items: center;
+        }
+
+        #zoomSlider {
+            width: clamp(180px, 60vw, 250px); /* Responsive width for slider */
+            margin-bottom: var(--spacing-md); /* Margin after slider */
+            display: block;
+            appearance: none;
+            height: 8px; /* Thicker slider */
+            background: rgba(0, 0, 0, 0.15); /* Darker track */
+            border-radius: 4px;
+            outline: none;
+        }
+
+        #zoomSlider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px; /* Larger thumb */
+            height: 24px;
+            background: var(--color-deep-blue); /* Dark thumb */
+            border: 2px solid var(--color-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(0, 220, 253, 0.4);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #zoomSlider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--color-deep-blue);
+            border: 2px solid var(--color-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(0, 220, 253, 0.4);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #zoomSlider::-webkit-slider-thumb:hover,
+        #zoomSlider::-moz-range-thumb:hover {
+            background: var(--color-cyan);
+            box-shadow: 0 0 15px rgba(0, 220, 253, 0.6);
+        }
+
+        #scannedText {
+            margin-bottom: var(--spacing-md); /* Consistent margin */
+            /* Inherits glass-container styles */
+            word-wrap: break-word; /* Ensure text wraps */
+            color: var(--input-text-color); /* Apply text color */
+        }
+
+        .control-navbar {
+            display: flex; /* Ensure flexbox for internal layout */
+            flex-direction: column;
+            gap: var(--spacing-sm); /* Smaller gap for internal elements */
+            margin-bottom: var(--spacing-md); /* Consistent margin */
+            /* Inherits glass-container styles */
+        }
+
+        select, button { 
+            padding: 12px 20px; 
+            margin: 0; /* Remove default margins to use gap */
+            border-radius: 18px;
+            border: 2px solid var(--color-deep-blue); /* Darker border */
+            font-family: var(--font-secondary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: var(--button-background); /* Darker button background */
+            color: var(--button-text-color); /* White text */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Make buttons and select fill container width */
+        }
+
+        select:hover, button:hover:not(:disabled) {
+            background: var(--button-hover-background); /* Even darker on hover */
+            color: var(--color-white);
+            transform: translateY(-2px) scale(1.05);
+            border-color: var(--color-cyan); /* Cyan border on hover */
+            box-shadow: 
+                0 8px 25px rgba(0, 220, 253, 0.2), /* Cyan glow on hover */
+                0 0 20px rgba(0, 220, 253, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        button:disabled {
+            background: rgba(12, 17, 29, 0.3); /* Darker disabled background */
+            color: rgba(255, 255, 255, 0.6);
+            cursor: not-allowed;
+            transform: none;
+            border-color: rgba(12, 17, 29, 0.2);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(0, 220, 253, 0.2) 50%, 
+                transparent 70%
+            );
+            transform: translateX(-100%) rotate(45deg);
+            transition: transform 0.6s ease;
+        }
+
+        button:hover:not(:disabled)::before {
+            transform: translateX(100%) rotate(45deg);
+        }
+
+        #status { 
+            font-weight: bold; 
+            color: var(--color-dark-navy);
+            /* Inherits glass-container styles */
+            margin: var(--spacing-md) auto; /* Apply consistent margin and center */
+            word-wrap: break-word; /* Ensure text wraps */
+        }
+
+        /* Specific styles for textarea within a glass-container */
+        textarea.glass-container {
+            /* Override default textarea styles */
+            appearance: none; /* Remove default browser styling */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: var(--glass-background); /* Apply glass background */
+            border: 2px solid var(--glass-border); /* Apply glass border */
+            border-radius: var(--border-radius); /* Apply glass border-radius */
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.15), /* Apply glass shadows */
+                0 5px 15px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(var(--glass-blur)); /* Apply blur */
+            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
+            
+            margin-top: var(--spacing-sm); /* Adjust top margin for manual input */
+            font-family: var(--font-secondary);
+            resize: vertical; /* Allow vertical resizing */
+            color: var(--input-text-color); /* Apply text color */
+            min-height: 100px; /* Ensure a minimum height for usability */
+            width: clamp(280px, 90vw, 400px); /* Ensure it's responsive like other containers */
+            padding: var(--container-padding); /* Apply container padding */
+        }
+
+        textarea.glass-container::placeholder {
+            color: rgba(12, 17, 29, 0.5); /* Slightly lighter placeholder */
+        }
+
+        /* Ensure the :before and :after pseudo-elements also apply to textarea */
+        textarea.glass-container::before,
+        textarea.glass-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allows clicks through */
+            border-radius: var(--border-radius); /* Match textarea border-radius */
+            z-index: -1; /* For :before, behind the main element */
+        }
+
+        textarea.glass-container::before {
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--color-cyan), 
+                transparent, 
+                var(--color-cyan)
+            );
+            opacity: 0.8;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        textarea.glass-container::after {
+            background: rgba(255, 255, 255, 0.3); /* White shine color */
+            transform: skewX(-30deg);
+            transition: all 0.5s ease;
+        }
+
+        textarea.glass-container:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.25), 
+                0 8px 20px rgba(0, 220, 253, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        textarea.glass-container:hover::after {
+            left: 100%;
+        }
+
+
+        #popup {
+            display: none; 
+            background: var(--glass-background); /* White glass background */
+            border: 2px solid var(--glass-border); /* White glass border */
+            border-radius: var(--border-radius);
+            padding: var(--container-padding); /* Use container padding for popup */
+            position: fixed; 
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9); /* Initial scale for animation */
+            opacity: 0; /* Initial opacity for animation */
+            z-index: 9999; 
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.25), /* Stronger shadow */
+                0 0 30px rgba(0, 220, 253, 0.1);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bounce effect */
+            width: clamp(280px, 90vw, 450px); /* Responsive popup width */
+        }
+
+        #popup.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        #popup h3 {
+            color: var(--color-dark-navy);
+            margin-bottom: var(--spacing-sm); /* Adjusted margin */
+            text-shadow: none;
+        }
+
+        #popup button {
+            background: var(--button-background);
+            color: var(--button-text-color);
+            border-color: var(--button-background);
+            width: auto; /* Buttons inside popup don't need full width */
+            margin-top: var(--spacing-md); /* Margin above OK button */
+        }
+
+        #popup button:hover {
+            background: var(--button-hover-background);
+            color: var(--color-white);
+            border-color: var(--color-cyan);
+            box-shadow: 0 0 15px rgba(0, 220, 253, 0.3);
+        }
+
+        #popupContent {
+            color: var(--color-dark-navy);
+            background: var(--color-light-gray);
+            padding: var(--spacing-sm); /* Use spacing variable */
+            border-radius: 10px;
+            margin: var(--spacing-sm) 0; /* Use spacing variable */
+            border: 1px solid var(--color-medium-blue);
+        }
+
+        #overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.6); /* Darker overlay for white theme */
+            z-index: 9998;
+            backdrop-filter: blur(8px); /* Stronger blur */
+            -webkit-backdrop-filter: blur(8px);
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        #overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        #loading {
+            position: fixed;
+            top: 0; 
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9); /* Darker loading overlay */
+            z-index: 9999;
+            color: var(--color-white); 
+            font-size: 20px;
+            font-family: var(--font-primary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            text-shadow: 0 0 20px rgba(0, 220, 253, 0.3);
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent); /* Darker HR gradient */
+            margin: var(--spacing-lg) 0; /* Use spacing variable for more prominent separator */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            color: var(--color-dark-navy); /* Darker label color */
+            font-weight: 700;
+            font-family: var(--font-secondary);
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Subtle Animations */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); }
+            50% { box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-md); 
+                gap: var(--spacing-md);
+            }
+
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: var(--spacing-md);
+            }
+
+            h3 {
+                margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+            }
+
+            .glass-container {
+                padding: 16px; 
+                width: clamp(280px, 90vw, 400px); 
+            }
+
+            #reader {
+                width: clamp(250px, 85vw, 350px); 
+            }
+
+            #scannedText, #status {
+                width: clamp(250px, 85vw, 350px); 
+            }
+
+            textarea.glass-container { /* Specific width for textarea on medium screens */
+                width: clamp(250px, 85vw, 350px);
+            }
+
+            select, button {
+                font-size: 0.8rem;
+                padding: 10px 18px;
+            }
+
+            hr {
+                margin: var(--spacing-md) 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: var(--spacing-sm); 
+                gap: var(--spacing-sm); 
+                justify-content: flex-start;
+            }
+
+            h2 {
+                font-size: 1.6rem; 
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            h3 {
+                font-size: 1.1rem; 
+                margin: var(--spacing-sm) 0 var(--spacing-xs) 0;
+            }
+
+            .glass-container {
+                padding: 12px; 
+                width: calc(100% - var(--spacing-md)); 
+                border-radius: 15px; 
+            }
+
+            #reader {
+                width: calc(100% - var(--spacing-md)); 
+                margin-bottom: var(--spacing-sm);
+            }
+
+            #zoomSlider {
+                width: calc(100% - var(--spacing-md));
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            #scannedText, #status {
+                width: calc(100% - var(--spacing-md)); 
+                margin: var(--spacing-sm) auto; 
+            }
+
+            textarea.glass-container { /* Specific width for textarea on small screens */
+                width: calc(100% - var(--spacing-md));
+            }
+
+            .control-navbar {
+                gap: var(--spacing-xs); 
+            }
+
+            select, button {
+                font-size: 0.75rem; 
+                padding: 8px 12px; 
+                border-radius: 12px; 
+                letter-spacing: 0.5px;
+            }
+
+            #popup {
+                padding: 15px; 
+                width: calc(100% - var(--spacing-md));
+            }
+
+            #popup h3 {
+                font-size: 1.2rem;
+                margin-bottom: var(--spacing-xs);
+            }
+
+            #popup button {
+                padding: 8px 15px;
+                margin-top: var(--spacing-sm);
+            }
+
+            #popupContent {
+                padding: var(--spacing-xs);
+                font-size: 0.9rem;
+            }
+
+            #loading {
+                font-size: 16px; 
+            }
+
+            hr {
+                margin: var(--spacing-md) 0;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: var(--spacing-xs); 
+                gap: var(--spacing-xs); 
+            }
+
+            h2 {
+                font-size: 1.4rem; 
+                margin-bottom: var(--spacing-xs);
+            }
+            
+            h3 {
+                font-size: 1rem;
+                margin: var(--spacing-xs) 0;
+            }
+
+            .glass-container, #reader, #zoomSlider, #scannedText, #status, #popup {
+                width: calc(100% - var(--spacing-sm)); 
+                padding: 10px; 
+            }
+
+            textarea.glass-container { /* Specific width for textarea on extra small screens */
+                width: calc(100% - var(--spacing-sm));
+            }
+            
+            select, button {
+                font-size: 0.7rem; 
+                padding: 6px 10px; 
+                border-radius: 10px;
+                letter-spacing: 0.2px;
+            }
+
+            #popup {
+                padding: 10px;
+            }
+
+            #popup h3 {
+                font-size: 1rem;
+            }
+
+            #popup button {
+                padding: 6px 10px;
+                margin-top: var(--spacing-sm);
+            }
+
+            #popupContent {
+                font-size: 0.8rem;
+            }
+
+            hr {
+                margin: var(--spacing-sm) 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h2>📸 QR Attendance Scanner</h2>
-  <div id="reader"></div>
-  <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
+    <h2>QR Attendance Scanner</h2>
+    <div id="reader" class="glass-container"></div>
+    <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
 
-  <pre id="scannedText">No scan yet...</pre>
+    <pre id="scannedText" class="glass-container">No scan yet...</pre>
 
-  <label for="yearLevel">Select Year Level:</label>
-  <select id="yearLevel">
-    <option value="">-- Select --</option>
-    <option value="1st Year">1st Year</option>
-    <option value="2nd Year">2nd Year</option>
-    <option value="3rd Year">3rd Year</option>
-    <option value="4th Year">4th Year</option>
-  </select><br>
+    <div class="control-navbar glass-container">
+        <label for="yearLevel">Select Year Level:</label>
+        <select id="yearLevel">
+            <option value="">Select</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+        </select>
 
-  <button onclick="submitAttendance()" id="submitBtn" disabled>📤 Confirm & Send</button>
+        <button onclick="submitAttendance()" id="submitBtn" disabled>Confirm & Send</button>
+    </div>
 
-  <p id="status">Waiting for scan or input...</p>
+    <p id="status" class="glass-container">Waiting for scan or input...</p>
 
-  <hr>
-  <h3>📋 Manual Input</h3>
-  <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40" oninput="checkInputs()"></textarea>
+    <hr>
+    <h3>Manual Input</h3>
+    <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
 
-  <div id="overlay"></div>
-  <div id="popup">
-    <h3>Student Info</h3>
-    <pre id="popupContent"></pre>
-    <button onclick="closePopup()">✅ OK</button>
-  </div>
+    <div id="overlay"></div>
+    <div id="popup">
+        <h3>Student Info</h3>
+        <pre id="popupContent"></pre>
+        <button onclick="closePopup()">OK</button>
+    </div>
 
-  <div id="loading">⏳ Sending attendance... Please wait.</div>
+    <div id="loading">⏳ Sending attendance... Please wait.</div>
 
-  <script>
-    const endpoint = "https://script.google.com/macros/s/AKfycbxge50iCgqrEm-1LsAIjZ2Dft7A1DFTLO1mt0doNeLV1dVYYde2OHaL-JxjhshfL0FF/exec";
-    const scanner = new Html5Qrcode("reader");
-    let videoTrack = null;
-    let lastScanned = "";
+    <script>
+        const endpoint = "https://script.google.com/macros/s/AKfycbxge50iCgqrEm-1LsAIjZ2Dft7A1DFTLO1mt0doNeLV1dVYYde2OHL2xV1sYDE2OHL2xV1sYDE2OHL2xV1s/exec"; // Placeholder URL, replace with your actual URL
+        const scanner = new Html5Qrcode("reader");
+        let videoTrack = null;
+        let lastScanned = "";
 
-    function sendToScript(data) {
-      document.getElementById("loading").style.display = "flex";
+        function sendToScript(data) {
+            document.getElementById("loading").style.display = "flex";
 
-      fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: data
-      }).then(res => res.text())
-        .then(msg => {
-          document.getElementById("status").innerText = msg;
-          document.getElementById("submitBtn").disabled = true;
-          document.getElementById("scannedText").innerText = "No scan yet...";
-          document.getElementById("manualInput").value = "";
-          lastScanned = "";
-        }).catch(() => {
-          document.getElementById("status").innerText = "❌ Failed to send";
-        }).finally(() => {
-          document.getElementById("loading").style.display = "none";
-        });
-    }
-
-   function submitAttendance() {
-  const yearLevel = document.getElementById("yearLevel").value;
-  const manualInput = document.getElementById("manualInput").value.trim();
-  const statusEl = document.getElementById("status");
-  const submitBtn = document.getElementById("submitBtn");
-
-  if (!yearLevel) {
-    alert("Please select year level.");
-    return;
-  }
-
-  const payload = manualInput
-    ? `${manualInput}|YEARLEVEL=${yearLevel}`
-    : lastScanned
-      ? `${lastScanned}|YEARLEVEL=${yearLevel}`
-      : null;
-
-  if (!payload) {
-    alert("No scanned or manual data found.");
-    return;
-  }
-
-  statusEl.innerText = "⏳ Sending...";
-  submitBtn.disabled = true;
-  document.getElementById("loading").style.display = "flex";
-
-  fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: payload
-  }).then(res => res.text())
-    .then(msg => {
-      statusEl.innerText = msg;
-      document.getElementById("scannedText").innerText = "No scan yet...";
-      document.getElementById("manualInput").value = "";
-      lastScanned = "";
-    }).catch(() => {
-      statusEl.innerText = "❌ Failed to send";
-    }).finally(() => {
-      document.getElementById("loading").style.display = "none";
-      submitBtn.disabled = true;
-    });
-
-  closePopup();
-}
-
-
-
-    function onScanSuccess(decodedText) {
-      lastScanned = decodedText;
-      document.getElementById("scannedText").innerText = decodedText;
-      document.getElementById("status").innerText = "✅ QR scanned. Select year level.";
-      checkInputs();
-      showPopup(decodedText);
-    }
-
-    function showPopup(text) {
-      document.getElementById("popupContent").innerText = text;
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("popup").style.display = "block";
-    }
-
-    function closePopup() {
-      document.getElementById("popup").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
-    }
-
-    function checkInputs() {
-      const manualInput = document.getElementById("manualInput").value.trim();
-      const enable = manualInput || lastScanned;
-      document.getElementById("submitBtn").disabled = !enable;
-    }
-
-    Html5Qrcode.getCameras().then(devices => {
-      if (devices.length) {
-        const backCam = devices.find(device =>
-          device.label.toLowerCase().includes("back") ||
-          device.label.toLowerCase().includes("rear")
-        ) || devices[0];
-
-        scanner.start(
-          { deviceId: { exact: backCam.id } },
-          { fps: 10, qrbox: 250 },
-          onScanSuccess
-        ).then(() => enableZoomControl());
-      } else {
-        document.getElementById("status").innerText = "❌ No camera found.";
-      }
-    });
-
-    function enableZoomControl() {
-      setTimeout(() => {
-        const video = document.querySelector("video");
-        if (video && video.srcObject) {
-          videoTrack = video.srcObject.getVideoTracks()[0];
-          const caps = videoTrack.getCapabilities?.();
-          const slider = document.getElementById("zoomSlider");
-
-          if (caps && caps.zoom) {
-            slider.min = caps.zoom.min;
-            slider.max = caps.zoom.max;
-            slider.step = caps.zoom.step || 0.1;
-            slider.value = caps.zoom.min;
-            slider.disabled = false;
-            slider.oninput = () => {
-              videoTrack.applyConstraints({ advanced: [{ zoom: parseFloat(slider.value) }] });
-            };
-          }
+            fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: data
+            }).then(res => res.text())
+                .then(msg => {
+                    document.getElementById("status").innerText = msg;
+                    document.getElementById("submitBtn").disabled = true;
+                    document.getElementById("scannedText").innerText = "No scan yet...";
+                    document.getElementById("manualInput").value = "";
+                    lastScanned = "";
+                }).catch(() => {
+                    document.getElementById("status").innerText = "Failed to send";
+                }).finally(() => {
+                    document.getElementById("loading").style.display = "none";
+                });
         }
-      }, 1000);
-    }
-  </script>
+
+        function submitAttendance() {
+            const yearLevel = document.getElementById("yearLevel").value;
+            const manualInput = document.getElementById("manualInput").value.trim();
+            const statusEl = document.getElementById("status");
+            const submitBtn = document.getElementById("submitBtn");
+
+            if (!yearLevel) {
+                alert("Please select year level.");
+                return;
+            }
+
+            const payload = manualInput
+                ? `${manualInput}|YEARLEVEL=${yearLevel}`
+                : lastScanned
+                    ? `${lastScanned}|YEARLEVEL=${yearLevel}`
+                    : null;
+
+            if (!payload) {
+                alert("No scanned or manual data found.");
+                return;
+            }
+
+            statusEl.innerText = "⏳ Sending...";
+            submitBtn.disabled = true;
+            document.getElementById("loading").style.display = "flex";
+
+            fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: payload
+            }).then(res => res.text())
+                .then(msg => {
+                    statusEl.innerText = msg;
+                    document.getElementById("scannedText").innerText = "No scan yet...";
+                    document.getElementById("manualInput").value = "";
+                    lastScanned = "";
+                }).catch(() => {
+                    statusEl.innerText = "❌ Failed to send";
+                }).finally(() => {
+                    document.getElementById("loading").style.display = "none";
+                    submitBtn.disabled = true;
+                });
+
+            closePopup();
+        }
+
+        function onScanSuccess(decodedText) {
+            lastScanned = decodedText;
+            document.getElementById("scannedText").innerText = decodedText;
+            document.getElementById("status").innerText = "✅ QR scanned. Select year level.";
+            checkInputs();
+            showPopup(decodedText);
+        }
+
+        function showPopup(text) {
+            const popup = document.getElementById("popup");
+            const overlay = document.getElementById("overlay");
+            document.getElementById("popupContent").innerText = text;
+            overlay.classList.add("show");
+            popup.classList.add("show");
+        }
+
+        function closePopup() {
+            const popup = document.getElementById("popup");
+            const overlay = document.getElementById("overlay");
+            popup.classList.remove("show");
+            overlay.classList.remove("show");
+            // Give a slight delay for the animation to finish before hiding completely
+            setTimeout(() => {
+                popup.style.display = "none";
+                overlay.style.display = "none";
+            }, 400); 
+        }
+
+        function checkInputs() {
+            const manualInput = document.getElementById("manualInput").value.trim();
+            const enable = manualInput || lastScanned;
+            document.getElementById("submitBtn").disabled = !enable;
+        }
+
+        Html5Qrcode.getCameras().then(devices => {
+            if (devices.length) {
+                const backCam = devices.find(device =>
+                    device.label.toLowerCase().includes("back") ||
+                    device.label.toLowerCase().includes("rear")
+                ) || devices[0];
+
+                scanner.start(
+                    { deviceId: { exact: backCam.id } },
+                    { fps: 10, qrbox: 250 },
+                    onScanSuccess
+                ).then(() => enableZoomControl());
+            } else {
+                document.getElementById("status").innerText = "❌ No camera found.";
+            }
+        });
+
+        function enableZoomControl() {
+            setTimeout(() => {
+                const video = document.querySelector("video");
+                if (video && video.srcObject) {
+                    videoTrack = video.srcObject.getVideoTracks()[0];
+                    const caps = videoTrack.getCapabilities?.();
+                    const slider = document.getElementById("zoomSlider");
+
+                    if (caps && caps.zoom) {
+                        slider.min = caps.zoom.min;
+                        slider.max = caps.zoom.max;
+                        slider.step = caps.zoom.step || 0.1;
+                        slider.value = caps.zoom.min;
+                        slider.disabled = false;
+                        slider.oninput = () => {
+                            videoTrack.applyConstraints({ advanced: [{ zoom: parseFloat(slider.value) }] });
+                        };
+                    }
+                }
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
