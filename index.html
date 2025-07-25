@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Attendance Scanner</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
@@ -11,6 +12,7 @@
             --color-light-gray: #e9ecef;
             --color-dark-navy: #0C111D;
             --color-deep-blue: #1a1f2e;
+            --color-medium-blue: #6c757d;
             --color-cyan: #00DCFD;
             --color-black: #000000;
             
@@ -30,12 +32,12 @@
             --input-border: var(--color-medium-blue);
             --input-text-color: var(--color-dark-navy);
 
-            /* Spacing Custom Properties */
-            --spacing-xs: 5px; /* Extra small spacing */
-            --spacing-sm: 10px;
-            --spacing-md: 15px; /* Slightly reduced default medium spacing */
-            --spacing-lg: 25px; /* Slightly reduced default large spacing */
-            --container-padding: 18px; /* Slightly reduced default padding for glass containers */
+            /* Responsive Spacing Custom Properties */
+            --spacing-xs: clamp(3px, 1vw, 5px); /* Extra small spacing */
+            --spacing-sm: clamp(6px, 2vw, 10px);
+            --spacing-md: clamp(10px, 2.5vw, 15px); /* Slightly reduced default medium spacing */
+            --spacing-lg: clamp(15px, 4vw, 25px); /* Slightly reduced default large spacing */
+            --container-padding: clamp(12px, 3vw, 18px); /* Slightly reduced default padding for glass containers */
         }
 
         * {
@@ -63,7 +65,7 @@
             font-family: var(--font-primary);
             margin-bottom: var(--spacing-md); /* Use spacing variable */
             text-shadow: 0 0 15px var(--heading-shadow-color);
-            font-size: 2.2rem;
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
         }
 
         h3 {
@@ -71,6 +73,7 @@
             font-family: var(--font-primary);
             margin: var(--spacing-md) 0 var(--spacing-sm) 0; /* Use spacing variables */
             text-shadow: 0 0 10px var(--heading-shadow-color);
+            font-size: clamp(1rem, 4vw, 1.2rem);
         }
 
         /* --- Global Glassmorphism Container Style --- */
@@ -137,10 +140,10 @@
         }
         /* --- End Global Glassmorphism Container Style --- */
 
-
         #reader { 
             /* Inherits most styles from .glass-container */
             width: clamp(250px, 80vw, 350px); /* Responsive width for reader */
+            height: clamp(180px, 40vw, 280px); /* Add responsive height */
             margin-bottom: var(--spacing-md); /* Specific margin for reader */
             overflow: hidden; /* Important for camera feed */
             box-shadow: /* Retain specific box-shadow for camera as it's animated */
@@ -154,12 +157,65 @@
             align-items: center;
         }
 
+        /* Make video and canvas inside reader responsive */
+        #reader video,
+        #reader canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover;
+            border-radius: calc(var(--border-radius) - 4px);
+        }
+
+        /* Fix QR scanner overlay positioning - make it inside the camera view */
+        #reader__scan_region {
+            position: relative !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: calc(var(--border-radius) - 4px);
+            overflow: hidden;
+        }
+
+        /* Style the QR box overlay to be inside the camera view */
+        #reader__scan_region img[alt="Info icon"] {
+            display: none !important; /* Hide the info icon */
+        }
+
+        /* Position the QR scanning box properly inside the camera view */
+        #reader__scan_region video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: calc(var(--border-radius) - 4px);
+        }
+
+        /* Fix the dashboard/controls positioning */
+        #reader__dashboard_section {
+            display: none !important; /* Hide the default dashboard as we have our own controls */
+        }
+
+        /* Style the scanning region border */
+        #reader__scan_region {
+            border: 3px solid var(--color-cyan) !important;
+            box-shadow: 
+                0 0 20px rgba(0, 220, 253, 0.3),
+                inset 0 0 20px rgba(0, 220, 253, 0.1) !important;
+        }
+
+        /* Fix the QR code scanning area overlay */
+        #reader div[style*="position: absolute"] {
+            border: 2px solid var(--color-cyan) !important;
+            border-radius: 8px !important;
+            box-shadow: 
+                0 0 15px rgba(0, 220, 253, 0.5),
+                inset 0 0 15px rgba(0, 220, 253, 0.2) !important;
+        }
+
         #zoomSlider {
             width: clamp(180px, 60vw, 250px); /* Responsive width for slider */
             margin-bottom: var(--spacing-md); /* Margin after slider */
             display: block;
             appearance: none;
-            height: 8px; /* Thicker slider */
+            height: clamp(6px, 1.5vw, 8px); /* Thicker slider */
             background: rgba(0, 0, 0, 0.15); /* Darker track */
             border-radius: 4px;
             outline: none;
@@ -167,8 +223,8 @@
 
         #zoomSlider::-webkit-slider-thumb {
             appearance: none;
-            width: 24px; /* Larger thumb */
-            height: 24px;
+            width: clamp(20px, 4vw, 24px); /* Larger thumb */
+            height: clamp(20px, 4vw, 24px);
             background: var(--color-deep-blue); /* Dark thumb */
             border: 2px solid var(--color-cyan);
             border-radius: 50%;
@@ -178,8 +234,8 @@
         }
 
         #zoomSlider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
+            width: clamp(20px, 4vw, 24px);
+            height: clamp(20px, 4vw, 24px);
             background: var(--color-deep-blue);
             border: 2px solid var(--color-cyan);
             border-radius: 50%;
@@ -199,6 +255,8 @@
             /* Inherits glass-container styles */
             word-wrap: break-word; /* Ensure text wraps */
             color: var(--input-text-color); /* Apply text color */
+            min-height: clamp(60px, 12vw, 80px); /* Ensure minimum height */
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
         /* Specific styling for the control section (label, select, button) */
@@ -211,13 +269,13 @@
         }
 
         select, button { 
-            padding: 12px 20px; 
+            padding: clamp(8px, 2.5vw, 12px) clamp(15px, 4vw, 20px); 
             margin: 0; /* Remove default margins to use gap */
-            border-radius: 18px;
+            border-radius: clamp(12px, 3vw, 18px);
             border: 2px solid var(--color-deep-blue); /* Darker border */
             font-family: var(--font-secondary);
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: clamp(0.7rem, 2.2vw, 0.85rem);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             background: var(--button-background); /* Darker button background */
             color: var(--button-text-color); /* White text */
@@ -228,6 +286,7 @@
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             width: 100%; /* Make buttons and select fill container width */
+            min-height: clamp(40px, 8vw, 48px); /* Touch-friendly minimum height */
         }
 
         select:hover, button:hover:not(:disabled) {
@@ -275,6 +334,8 @@
             /* Inherits glass-container styles */
             margin: var(--spacing-md) auto; /* Apply consistent margin and center */
             word-wrap: break-word; /* Ensure text wraps */
+            min-height: clamp(50px, 10vw, 70px);
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
         /* Specific styles for textarea within a glass-container */
@@ -299,9 +360,10 @@
             font-family: var(--font-secondary);
             resize: vertical; /* Allow vertical resizing */
             color: var(--input-text-color); /* Apply text color */
-            min-height: 100px; /* Ensure a minimum height for usability */
+            min-height: clamp(80px, 20vw, 100px); /* Ensure a minimum height for usability */
             width: clamp(280px, 90vw, 400px); /* Ensure it's responsive like other containers */
             padding: var(--container-padding); /* Apply container padding */
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
         textarea.glass-container::placeholder {
@@ -352,7 +414,6 @@
             left: 100%;
         }
 
-
         #popup {
             display: none; 
             background: var(--glass-background); /* White glass background */
@@ -372,6 +433,8 @@
             -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bounce effect */
             width: clamp(280px, 90vw, 450px); /* Responsive popup width */
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         #popup.show {
@@ -384,6 +447,7 @@
             color: var(--color-dark-navy);
             margin-bottom: var(--spacing-sm); /* Adjusted margin */
             text-shadow: none;
+            font-size: clamp(1rem, 3vw, 1.2rem);
         }
 
         #popup button {
@@ -392,6 +456,7 @@
             border-color: var(--button-background);
             width: auto; /* Buttons inside popup don't need full width */
             margin-top: var(--spacing-md); /* Margin above OK button */
+            min-width: clamp(80px, 20vw, 120px);
         }
 
         #popup button:hover {
@@ -408,6 +473,8 @@
             border-radius: 10px;
             margin: var(--spacing-sm) 0; /* Use spacing variable */
             border: 1px solid var(--color-medium-blue);
+            font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+            word-wrap: break-word;
         }
 
         #overlay {
@@ -439,7 +506,7 @@
             background: rgba(0, 0, 0, 0.9); /* Darker loading overlay */
             z-index: 9999;
             color: var(--color-white); 
-            font-size: 20px;
+            font-size: clamp(16px, 4vw, 20px);
             font-family: var(--font-primary);
             display: none;
             align-items: center;
@@ -455,6 +522,8 @@
             background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent); /* Darker HR gradient */
             margin: var(--spacing-lg) 0; /* Use spacing variable for more prominent separator */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: clamp(280px, 90vw, 400px);
         }
 
         label {
@@ -462,6 +531,7 @@
             font-weight: 700;
             font-family: var(--font-secondary);
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            font-size: clamp(0.8rem, 2.2vw, 1rem);
         }
 
         /* Subtle Animations */
@@ -470,182 +540,76 @@
             50% { box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); }
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: var(--spacing-md); 
-                gap: var(--spacing-md);
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .glass-container:hover {
+                transform: none;
             }
-
-            h2 {
-                font-size: 1.8rem;
-                margin-bottom: var(--spacing-md);
+            
+            select:hover, button:hover:not(:disabled) {
+                transform: none;
             }
-
-            h3 {
-                margin: var(--spacing-md) 0 var(--spacing-sm) 0;
-            }
-
-            .glass-container {
-                padding: 16px; 
-                width: clamp(280px, 90vw, 400px); 
-            }
-
-            #reader {
-                width: clamp(250px, 85vw, 350px); 
-            }
-
-            #scannedText, #status {
-                width: clamp(250px, 85vw, 350px); 
-            }
-
-            textarea.glass-container { /* Specific width for textarea on medium screens */
-                width: clamp(250px, 85vw, 350px);
-            }
-
-            select, button {
-                font-size: 0.8rem;
-                padding: 10px 18px;
-            }
-
-            hr {
-                margin: var(--spacing-md) 0;
+            
+            .glass-container::after {
+                display: none;
             }
         }
 
-        @media (max-width: 600px) {
+        /* Landscape orientation on mobile */
+        @media (orientation: landscape) and (max-height: 500px) {
             body {
-                padding: var(--spacing-sm); 
-                gap: var(--spacing-sm); 
-                justify-content: flex-start;
+                gap: var(--spacing-sm);
             }
-
+            
             h2 {
-                font-size: 1.6rem; 
+                font-size: clamp(1.2rem, 4vh, 1.8rem);
                 margin-bottom: var(--spacing-sm);
             }
             
-            h3 {
-                font-size: 1.1rem; 
-                margin: var(--spacing-sm) 0 var(--spacing-xs) 0;
-            }
-
-            .glass-container {
-                padding: 12px; 
-                width: calc(100% - var(--spacing-md)); 
-                border-radius: 15px; 
-            }
-
             #reader {
-                width: calc(100% - var(--spacing-md)); 
-                margin-bottom: var(--spacing-sm);
-            }
-
-            #zoomSlider {
-                width: calc(100% - var(--spacing-md));
-                margin-bottom: var(--spacing-sm);
-            }
-            
-            #scannedText, #status {
-                width: calc(100% - var(--spacing-md)); 
-                margin: var(--spacing-sm) auto; 
-            }
-
-            textarea.glass-container { /* Specific width for textarea on small screens */
-                width: calc(100% - var(--spacing-md));
-            }
-
-            .control-section { /* Renamed for consistency */
-                gap: var(--spacing-xs); 
-            }
-
-            select, button {
-                font-size: 0.75rem; 
-                padding: 8px 12px; 
-                border-radius: 12px; 
-                letter-spacing: 0.5px;
-            }
-
-            #popup {
-                padding: 15px; 
-                width: calc(100% - var(--spacing-md));
-            }
-
-            #popup h3 {
-                font-size: 1.2rem;
-                margin-bottom: var(--spacing-xs);
-            }
-
-            #popup button {
-                padding: 8px 15px;
-                margin-top: var(--spacing-sm);
-            }
-
-            #popupContent {
-                padding: var(--spacing-xs);
-                font-size: 0.9rem;
-            }
-
-            #loading {
-                font-size: 16px; 
-            }
-
-            hr {
-                margin: var(--spacing-md) 0;
+                height: clamp(120px, 25vh, 180px);
             }
         }
 
-        @media (max-width: 400px) {
+        /* Extra small screens */
+        @media (max-width: 320px) {
             body {
-                padding: var(--spacing-xs); 
-                gap: var(--spacing-xs); 
-            }
-
-            h2 {
-                font-size: 1.4rem; 
-                margin-bottom: var(--spacing-xs);
+                padding: 8px;
+                gap: 8px;
             }
             
-            h3 {
-                font-size: 1rem;
-                margin: var(--spacing-xs) 0;
-            }
-
-            .glass-container, #reader, #zoomSlider, #scannedText, #status, #popup {
-                width: calc(100% - var(--spacing-sm)); 
-                padding: 10px; 
-            }
-
-            textarea.glass-container { /* Specific width for textarea on extra small screens */
-                width: calc(100% - var(--spacing-sm));
-            }
-            
-            select, button {
-                font-size: 0.7rem; 
-                padding: 6px 10px; 
-                border-radius: 10px;
-                letter-spacing: 0.2px;
-            }
-
-            #popup {
+            .glass-container {
+                width: calc(100vw - 16px);
                 padding: 10px;
             }
-
-            #popup h3 {
-                font-size: 1rem;
+            
+            textarea.glass-container {
+                width: calc(100vw - 16px);
             }
-
-            #popup button {
-                padding: 6px 10px;
-                margin-top: var(--spacing-sm);
+            
+            #reader {
+                width: calc(100vw - 20px);
+                height: clamp(150px, 35vw, 200px);
             }
-
-            #popupContent {
-                font-size: 0.8rem;
+            
+            #zoomSlider {
+                width: calc(100vw - 20px);
             }
+        }
 
-            hr {
-                margin: var(--spacing-sm) 0;
+        /* Large screens optimization */
+        @media (min-width: 1200px) {
+            .glass-container, textarea.glass-container {
+                width: 450px;
+            }
+            
+            #reader {
+                width: 400px;
+                height: 320px;
+            }
+            
+            #zoomSlider {
+                width: 300px;
             }
         }
     </style>
