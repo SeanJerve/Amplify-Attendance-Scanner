@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Attendance Scanner</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
@@ -12,7 +11,6 @@
             --color-light-gray: #e9ecef;
             --color-dark-navy: #0C111D;
             --color-deep-blue: #1a1f2e;
-            --color-medium-blue: #6c757d;
             --color-cyan: #00DCFD;
             --color-black: #000000;
             
@@ -20,30 +18,24 @@
             --font-secondary: 'Arial', sans-serif;
             
             --border-radius: 20px;
-            --glass-blur: 25px;
-            --glass-background: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --text-color: var(--color-dark-navy);
-            --heading-shadow-color: rgba(0, 0, 0, 0.15);
-            --button-text-color: var(--color-white);
-            --button-background: var(--color-deep-blue);
+            --glass-blur: 25px; /* Increased blur for more prominent glass effect */
+            --glass-background: rgba(255, 255, 255, 0.15); /* Lighter background for white theme */
+            --glass-border: rgba(255, 255, 255, 0.4); /* Lighter border for white theme */
+            --text-color: var(--color-dark-navy); /* Default text color for dark-on-white */
+            --heading-shadow-color: rgba(0, 0, 0, 0.15); /* Softer shadow for headings */
+            --button-text-color: var(--color-white); /* White text on dark buttons */
+            --button-background: var(--color-deep-blue); /* Darker button background */
             --button-hover-background: var(--color-dark-navy);
             --input-background: var(--color-white);
             --input-border: var(--color-medium-blue);
             --input-text-color: var(--color-dark-navy);
 
-            /* Responsive Spacing System */
-            --spacing-xs: clamp(4px, 1vw, 8px);
-            --spacing-sm: clamp(8px, 2vw, 16px);
-            --spacing-md: clamp(12px, 3vw, 24px);
-            --spacing-lg: clamp(16px, 4vw, 32px);
-            --spacing-xl: clamp(20px, 5vw, 40px);
-            
-            /* Container sizing */
-            --container-padding: clamp(12px, 3vw, 24px);
-            --container-width: clamp(280px, 90vw, 500px);
-            --reader-width: clamp(250px, 85vw, 400px);
-            --reader-height: clamp(200px, 40vw, 300px);
+            /* Spacing Custom Properties */
+            --spacing-xs: 5px; /* Extra small spacing */
+            --spacing-sm: 10px;
+            --spacing-md: 15px; /* Slightly reduced default medium spacing */
+            --spacing-lg: 25px; /* Slightly reduced default large spacing */
+            --container-padding: 18px; /* Slightly reduced default padding for glass containers */
         }
 
         * {
@@ -55,55 +47,49 @@
         body { 
             font-family: var(--font-secondary); 
             text-align: center; 
-            padding: var(--spacing-md);
-            background: linear-gradient(135deg, var(--color-white), var(--color-light-gray));
-            color: var(--text-color);
+            padding: var(--spacing-md); /* Use spacing variable */
+            background: linear-gradient(135deg, var(--color-white), var(--color-light-gray)); /* White background gradient */
+            color: var(--text-color); /* Default text color */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            gap: var(--spacing-md);
-            line-height: 1.5;
+            justify-content: flex-start; /* Align items to the start for better flow on small screens */
+            gap: var(--spacing-md); /* Add gap for consistent spacing between main elements */
         }
 
         h2 {
-            color: var(--color-dark-navy);
+            color: var(--color-dark-navy); /* Darker heading color */
             font-family: var(--font-primary);
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-md); /* Use spacing variable */
             text-shadow: 0 0 15px var(--heading-shadow-color);
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            font-weight: 900;
-            letter-spacing: -0.02em;
+            font-size: 2.2rem;
         }
 
         h3 {
-            color: var(--color-dark-navy);
+            color: var(--color-dark-navy); /* Darker heading color */
             font-family: var(--font-primary);
-            margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+            margin: var(--spacing-md) 0 var(--spacing-sm) 0; /* Use spacing variables */
             text-shadow: 0 0 10px var(--heading-shadow-color);
-            font-size: clamp(1.1rem, 4vw, 1.5rem);
-            font-weight: 800;
         }
 
-        /* Global Glassmorphism Container Style */
+        /* --- Global Glassmorphism Container Style --- */
         .glass-container {
             position: relative;
-            background: var(--glass-background);
-            border: 2px solid var(--glass-border);
+            background: var(--glass-background); /* White glass background */
+            border: 2px solid var(--glass-border); /* White glass border */
             border-radius: var(--border-radius);
-            padding: var(--container-padding);
+            padding: var(--container-padding); /* Use container padding variable */
             box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.15),
+                0 15px 35px rgba(0, 0, 0, 0.15), /* Softer shadow */
                 0 5px 15px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            margin: 0 auto;
-            width: var(--container-width);
-            max-width: 100%;
+                inset 0 1px 0 rgba(255, 255, 255, 0.8); /* Stronger inner highlight */
+            backdrop-filter: blur(var(--glass-blur)); /* Apply blur */
+            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
+            overflow: hidden; /* For gradient border effect and shine */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth transitions */
+            margin: 0 auto; /* Center individual containers */
+            width: clamp(280px, 90vw, 400px); /* Responsive width applied globally here */
         }
 
         .glass-container::before {
@@ -118,12 +104,13 @@
                 transparent, 
                 var(--color-cyan)
             );
-            border-radius: var(--border-radius);
+            border-radius: var(--border-radius); /* Match container border-radius */
             z-index: -1;
-            opacity: 0.8;
+            opacity: 0.8; /* Always visible */
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
+        /* Shine animation on hover */
         .glass-container::after {
             content: '';
             position: absolute;
@@ -131,155 +118,131 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.3); /* White shine color */
             transform: skewX(-30deg);
             transition: all 0.5s ease;
-            pointer-events: none;
+            pointer-events: none; /* Allows clicks through the shine */
         }
 
         .glass-container:hover {
-            transform: translateY(-3px) scale(1.02);
+            transform: translateY(-3px) scale(1.02); /* Slight scale on hover */
             box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.25),
+                0 20px 40px rgba(0, 0, 0, 0.25), /* Stronger shadow on hover */
                 0 8px 20px rgba(0, 220, 253, 0.08),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .glass-container:hover::after {
-            left: 100%;
+            left: 100%; /* Move shine across */
         }
+        /* --- End Global Glassmorphism Container Style --- */
 
-        /* QR Reader specific styling */
+
         #reader { 
-            width: var(--reader-width);
-            height: var(--reader-height);
-            margin-bottom: var(--spacing-md);
-            overflow: hidden;
-            box-shadow: 
+            /* Inherits most styles from .glass-container */
+            width: clamp(250px, 80vw, 350px); /* Responsive width for reader */
+            margin-bottom: var(--spacing-md); /* Specific margin for reader */
+            overflow: hidden; /* Important for camera feed */
+            box-shadow: /* Retain specific box-shadow for camera as it's animated */
                 0 0 30px rgba(0, 0, 0, 0.1),
                 0 15px 35px rgba(0, 0, 0, 0.2);
             animation: glow 3s ease-in-out infinite;
             position: relative;
-            background-color: var(--color-black);
-            display: flex;
+            background-color: var(--color-black); /* Ensure a solid background for video */
+            display: flex; /* Make it a flex container for centering video */
             justify-content: center;
             align-items: center;
-            min-height: 200px;
         }
 
-        /* Make the QR scanner video responsive */
-        #reader video {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover;
-            border-radius: calc(var(--border-radius) - 4px);
-        }
-
-        #reader canvas {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: calc(var(--border-radius) - 4px);
-        }
-
-        /* Zoom slider */
         #zoomSlider {
-            width: clamp(200px, 70vw, 300px);
-            margin-bottom: var(--spacing-md);
+            width: clamp(180px, 60vw, 250px); /* Responsive width for slider */
+            margin-bottom: var(--spacing-md); /* Margin after slider */
             display: block;
             appearance: none;
-            height: clamp(6px, 1.5vw, 10px);
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 50px;
+            height: 8px; /* Thicker slider */
+            background: rgba(0, 0, 0, 0.15); /* Darker track */
+            border-radius: 4px;
             outline: none;
-            cursor: pointer;
         }
 
         #zoomSlider::-webkit-slider-thumb {
             appearance: none;
-            width: clamp(18px, 4vw, 28px);
-            height: clamp(18px, 4vw, 28px);
-            background: var(--color-deep-blue);
+            width: 24px; /* Larger thumb */
+            height: 24px;
+            background: var(--color-deep-blue); /* Dark thumb */
             border: 2px solid var(--color-cyan);
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 12px rgba(0, 220, 253, 0.4);
-            transition: all 0.3s ease;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
 
         #zoomSlider::-moz-range-thumb {
-            width: clamp(18px, 4vw, 28px);
-            height: clamp(18px, 4vw, 28px);
+            width: 24px;
+            height: 24px;
             background: var(--color-deep-blue);
             border: 2px solid var(--color-cyan);
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 12px rgba(0, 220, 253, 0.4);
-            transition: all 0.3s ease;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
 
         #zoomSlider::-webkit-slider-thumb:hover,
         #zoomSlider::-moz-range-thumb:hover {
             background: var(--color-cyan);
             box-shadow: 0 0 15px rgba(0, 220, 253, 0.6);
-            transform: scale(1.1);
         }
 
-        /* Scanned text display */
         #scannedText {
-            margin-bottom: var(--spacing-md);
-            word-wrap: break-word;
-            color: var(--input-text-color);
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            line-height: 1.4;
-            min-height: clamp(60px, 15vw, 100px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin-bottom: var(--spacing-md); /* Consistent margin */
+            /* Inherits glass-container styles */
+            word-wrap: break-word; /* Ensure text wraps */
+            color: var(--input-text-color); /* Apply text color */
         }
 
-        /* Control section */
-        .control-section {
-            display: flex;
+        /* Specific styling for the control section (label, select, button) */
+        .control-section { /* Changed from .control-navbar to .control-section for better semantic clarity */
+            display: flex; /* Ensure flexbox for internal layout */
             flex-direction: column;
-            gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-md);
+            gap: var(--spacing-sm); /* Smaller gap for internal elements */
+            margin-bottom: var(--spacing-md); /* Consistent margin */
+            /* Inherits glass-container styles */
         }
 
-        /* Form elements */
         select, button { 
-            padding: clamp(10px, 3vw, 16px) clamp(16px, 4vw, 24px);
-            margin: 0;
-            border-radius: clamp(12px, 3vw, 20px);
-            border: 2px solid var(--color-deep-blue);
+            padding: 12px 20px; 
+            margin: 0; /* Remove default margins to use gap */
+            border-radius: 18px;
+            border: 2px solid var(--color-deep-blue); /* Darker border */
             font-family: var(--font-secondary);
             font-weight: 700;
-            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            font-size: 0.85rem;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            background: var(--button-background);
-            color: var(--button-text-color);
+            background: var(--button-background); /* Darker button background */
+            color: var(--button-text-color); /* White text */
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            min-height: clamp(44px, 12vw, 56px);
+            width: 100%; /* Make buttons and select fill container width */
         }
 
         select:hover, button:hover:not(:disabled) {
-            background: var(--button-hover-background);
+            background: var(--button-hover-background); /* Even darker on hover */
             color: var(--color-white);
-            transform: translateY(-2px) scale(1.02);
-            border-color: var(--color-cyan);
+            transform: translateY(-2px) scale(1.05);
+            border-color: var(--color-cyan); /* Cyan border on hover */
             box-shadow: 
-                0 8px 25px rgba(0, 220, 253, 0.2),
+                0 8px 25px rgba(0, 220, 253, 0.2), /* Cyan glow on hover */
                 0 0 20px rgba(0, 220, 253, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         button:disabled {
-            background: rgba(12, 17, 29, 0.3);
+            background: rgba(12, 17, 29, 0.3); /* Darker disabled background */
             color: rgba(255, 255, 255, 0.6);
             cursor: not-allowed;
             transform: none;
@@ -306,73 +269,109 @@
             transform: translateX(100%) rotate(45deg);
         }
 
-        /* Status display */
         #status { 
             font-weight: bold; 
             color: var(--color-dark-navy);
-            margin: var(--spacing-md) auto;
-            word-wrap: break-word;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            min-height: clamp(50px, 12vw, 70px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            /* Inherits glass-container styles */
+            margin: var(--spacing-md) auto; /* Apply consistent margin and center */
+            word-wrap: break-word; /* Ensure text wraps */
         }
 
-        /* Manual input textarea */
+        /* Specific styles for textarea within a glass-container */
         textarea.glass-container {
-            appearance: none;
+            /* Override default textarea styles */
+            appearance: none; /* Remove default browser styling */
             -webkit-appearance: none;
             -moz-appearance: none;
             
-            background: var(--glass-background);
-            border: 2px solid var(--glass-border);
-            border-radius: var(--border-radius);
+            /* Apply glass container styles directly */
+            background: var(--glass-background); /* Explicitly set for textarea */
+            border: 2px solid var(--glass-border); /* Explicitly set for textarea */
+            border-radius: var(--border-radius); /* Explicitly set for textarea */
             box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.15),
+                0 15px 35px rgba(0, 0, 0, 0.15), /* Explicitly set for textarea */
                 0 5px 15px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
+            backdrop-filter: blur(var(--glass-blur)); /* Explicitly set for textarea */
+            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
             
-            margin-top: var(--spacing-sm);
+            margin-top: var(--spacing-sm); /* Adjust top margin for manual input */
             font-family: var(--font-secondary);
-            resize: vertical;
-            color: var(--input-text-color);
-            min-height: clamp(80px, 20vw, 120px);
-            width: var(--container-width);
-            max-width: 100%;
-            padding: var(--container-padding);
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            line-height: 1.4;
+            resize: vertical; /* Allow vertical resizing */
+            color: var(--input-text-color); /* Apply text color */
+            min-height: 100px; /* Ensure a minimum height for usability */
+            width: clamp(280px, 90vw, 400px); /* Ensure it's responsive like other containers */
+            padding: var(--container-padding); /* Apply container padding */
         }
 
         textarea.glass-container::placeholder {
-            color: rgba(12, 17, 29, 0.5);
+            color: rgba(12, 17, 29, 0.5); /* Slightly lighter placeholder */
         }
 
-        /* Popup styling */
+        /* Ensure the :before and :after pseudo-elements also apply to textarea */
+        textarea.glass-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--color-cyan), 
+                transparent, 
+                var(--color-cyan)
+            );
+            border-radius: var(--border-radius); /* Match textarea border-radius */
+            z-index: -1; /* Behind the main element */
+            opacity: 0.8;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        textarea.glass-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3); /* White shine color */
+            transform: skewX(-30deg);
+            transition: all 0.5s ease;
+            pointer-events: none; /* Allows clicks through */
+        }
+
+        textarea.glass-container:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.25), 
+                0 8px 20px rgba(0, 220, 253, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        textarea.glass-container:hover::after {
+            left: 100%;
+        }
+
+
         #popup {
             display: none; 
-            background: var(--glass-background);
-            border: 2px solid var(--glass-border);
+            background: var(--glass-background); /* White glass background */
+            border: 2px solid var(--glass-border); /* White glass border */
             border-radius: var(--border-radius);
-            padding: var(--container-padding);
+            padding: var(--container-padding); /* Use container padding for popup */
             position: fixed; 
             top: 50%; 
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9); /* Initial scale for animation */
+            opacity: 0; /* Initial opacity for animation */
             z-index: 9999; 
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.25),
+                0 25px 50px rgba(0, 0, 0, 0.25), /* Stronger shadow */
                 0 0 30px rgba(0, 220, 253, 0.1);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            width: clamp(280px, 85vw, 450px);
-            max-height: 80vh;
-            overflow-y: auto;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bounce effect */
+            width: clamp(280px, 90vw, 450px); /* Responsive popup width */
         }
 
         #popup.show {
@@ -383,18 +382,16 @@
 
         #popup h3 {
             color: var(--color-dark-navy);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm); /* Adjusted margin */
             text-shadow: none;
-            font-size: clamp(1.1rem, 3.5vw, 1.3rem);
         }
 
         #popup button {
             background: var(--button-background);
             color: var(--button-text-color);
             border-color: var(--button-background);
-            width: auto;
-            margin-top: var(--spacing-md);
-            min-width: clamp(80px, 20vw, 120px);
+            width: auto; /* Buttons inside popup don't need full width */
+            margin-top: var(--spacing-md); /* Margin above OK button */
         }
 
         #popup button:hover {
@@ -407,17 +404,12 @@
         #popupContent {
             color: var(--color-dark-navy);
             background: var(--color-light-gray);
-            padding: var(--spacing-sm);
+            padding: var(--spacing-sm); /* Use spacing variable */
             border-radius: 10px;
-            margin: var(--spacing-sm) 0;
+            margin: var(--spacing-sm) 0; /* Use spacing variable */
             border: 1px solid var(--color-medium-blue);
-            font-size: clamp(0.8rem, 2.2vw, 1rem);
-            line-height: 1.4;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
         }
 
-        /* Overlay */
         #overlay {
             display: none; 
             position: fixed; 
@@ -425,9 +417,9 @@
             left: 0;
             width: 100%; 
             height: 100%; 
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.6); /* Darker overlay for white theme */
             z-index: 9998;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px); /* Stronger blur */
             -webkit-backdrop-filter: blur(8px);
             transition: opacity 0.4s ease;
             opacity: 0;
@@ -438,17 +430,16 @@
             opacity: 1;
         }
 
-        /* Loading screen */
         #loading {
             position: fixed;
             top: 0; 
             left: 0;
             width: 100%; 
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.9); /* Darker loading overlay */
             z-index: 9999;
             color: var(--color-white); 
-            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            font-size: 20px;
             font-family: var(--font-primary);
             display: none;
             align-items: center;
@@ -458,112 +449,203 @@
             text-shadow: 0 0 20px rgba(0, 220, 253, 0.3);
         }
 
-        /* Horizontal rule */
         hr {
             border: none;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent);
-            margin: var(--spacing-lg) 0;
+            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent); /* Darker HR gradient */
+            margin: var(--spacing-lg) 0; /* Use spacing variable for more prominent separator */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: var(--container-width);
         }
 
-        /* Labels */
         label {
-            color: var(--color-dark-navy);
+            color: var(--color-dark-navy); /* Darker label color */
             font-weight: 700;
             font-family: var(--font-secondary);
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            display: block;
-            margin-bottom: var(--spacing-xs);
-            text-align: left;
         }
 
-        /* Animations */
+        /* Subtle Animations */
         @keyframes glow {
             0%, 100% { box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); }
             50% { box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); }
         }
 
-        /* Touch device optimizations */
-        @media (hover: none) and (pointer: coarse) {
-            .glass-container:hover {
-                transform: none;
-                box-shadow: 
-                    0 15px 35px rgba(0, 0, 0, 0.15),
-                    0 5px 15px rgba(0, 0, 0, 0.1),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-md); 
+                gap: var(--spacing-md);
             }
-            
-            select:hover, button:hover:not(:disabled) {
-                transform: none;
+
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: var(--spacing-md);
             }
-            
-            .glass-container::after {
-                display: none;
+
+            h3 {
+                margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+            }
+
+            .glass-container {
+                padding: 16px; 
+                width: clamp(280px, 90vw, 400px); 
+            }
+
+            #reader {
+                width: clamp(250px, 85vw, 350px); 
+            }
+
+            #scannedText, #status {
+                width: clamp(250px, 85vw, 350px); 
+            }
+
+            textarea.glass-container { /* Specific width for textarea on medium screens */
+                width: clamp(250px, 85vw, 350px);
+            }
+
+            select, button {
+                font-size: 0.8rem;
+                padding: 10px 18px;
+            }
+
+            hr {
+                margin: var(--spacing-md) 0;
             }
         }
 
-        /* Landscape orientation adjustments */
-        @media (orientation: landscape) and (max-height: 500px) {
+        @media (max-width: 600px) {
             body {
-                padding: var(--spacing-sm);
-                gap: var(--spacing-sm);
+                padding: var(--spacing-sm); 
+                gap: var(--spacing-sm); 
+                justify-content: flex-start;
             }
-            
+
             h2 {
-                font-size: clamp(1.2rem, 4vh, 1.8rem);
+                font-size: 1.6rem; 
                 margin-bottom: var(--spacing-sm);
             }
             
+            h3 {
+                font-size: 1.1rem; 
+                margin: var(--spacing-sm) 0 var(--spacing-xs) 0;
+            }
+
+            .glass-container {
+                padding: 12px; 
+                width: calc(100% - var(--spacing-md)); 
+                border-radius: 15px; 
+            }
+
             #reader {
-                height: clamp(150px, 30vh, 200px);
+                width: calc(100% - var(--spacing-md)); 
+                margin-bottom: var(--spacing-sm);
+            }
+
+            #zoomSlider {
+                width: calc(100% - var(--spacing-md));
+                margin-bottom: var(--spacing-sm);
             }
             
-            .glass-container {
-                padding: clamp(8px, 2vh, 16px);
+            #scannedText, #status {
+                width: calc(100% - var(--spacing-md)); 
+                margin: var(--spacing-sm) auto; 
+            }
+
+            textarea.glass-container { /* Specific width for textarea on small screens */
+                width: calc(100% - var(--spacing-md));
+            }
+
+            .control-section { /* Renamed for consistency */
+                gap: var(--spacing-xs); 
+            }
+
+            select, button {
+                font-size: 0.75rem; 
+                padding: 8px 12px; 
+                border-radius: 12px; 
+                letter-spacing: 0.5px;
+            }
+
+            #popup {
+                padding: 15px; 
+                width: calc(100% - var(--spacing-md));
+            }
+
+            #popup h3 {
+                font-size: 1.2rem;
+                margin-bottom: var(--spacing-xs);
+            }
+
+            #popup button {
+                padding: 8px 15px;
+                margin-top: var(--spacing-sm);
+            }
+
+            #popupContent {
+                padding: var(--spacing-xs);
+                font-size: 0.9rem;
+            }
+
+            #loading {
+                font-size: 16px; 
+            }
+
+            hr {
+                margin: var(--spacing-md) 0;
             }
         }
 
-        /* Very small screens */
-        @media (max-width: 320px) {
-            :root {
-                --container-width: calc(100vw - 20px);
-                --reader-width: calc(100vw - 30px);
+        @media (max-width: 400px) {
+            body {
+                padding: var(--spacing-xs); 
+                gap: var(--spacing-xs); 
+            }
+
+            h2 {
+                font-size: 1.4rem; 
+                margin-bottom: var(--spacing-xs);
             }
             
-            body {
+            h3 {
+                font-size: 1rem;
+                margin: var(--spacing-xs) 0;
+            }
+
+            .glass-container, #reader, #zoomSlider, #scannedText, #status, #popup {
+                width: calc(100% - var(--spacing-sm)); 
+                padding: 10px; 
+            }
+
+            textarea.glass-container { /* Specific width for textarea on extra small screens */
+                width: calc(100% - var(--spacing-sm));
+            }
+            
+            select, button {
+                font-size: 0.7rem; 
+                padding: 6px 10px; 
+                border-radius: 10px;
+                letter-spacing: 0.2px;
+            }
+
+            #popup {
                 padding: 10px;
-                gap: 10px;
             }
-        }
 
-        /* Large screens */
-        @media (min-width: 1200px) {
-            :root {
-                --container-width: 600px;
-                --reader-width: 500px;
+            #popup h3 {
+                font-size: 1rem;
             }
-        }
 
-        /* Print styles */
-        @media print {
-            #reader, #zoomSlider, button, #loading, #overlay, #popup {
-                display: none !important;
+            #popup button {
+                padding: 6px 10px;
+                margin-top: var(--spacing-sm);
             }
-            
-            body {
-                background: white;
-                color: black;
+
+            #popupContent {
+                font-size: 0.8rem;
             }
-            
-            .glass-container {
-                background: white;
-                border: 1px solid #ccc;
-                box-shadow: none;
-                backdrop-filter: none;
+
+            hr {
+                margin: var(--spacing-sm) 0;
             }
         }
     </style>
@@ -684,24 +766,28 @@
         }
 
         function showPopup(text) {
+            // Updated to use classlist for animation control
             const popup = document.getElementById("popup");
             const overlay = document.getElementById("overlay");
             document.getElementById("popupContent").innerText = text;
             overlay.classList.add("show");
             popup.classList.add("show");
+            // Ensure display:block immediately for interaction, then hide after animation
             popup.style.display = "block"; 
             overlay.style.display = "block";
         }
 
         function closePopup() {
+            // Updated to use classlist for animation control
             const popup = document.getElementById("popup");
             const overlay = document.getElementById("overlay");
             popup.classList.remove("show");
             overlay.classList.remove("show");
+            // Add a slight delay for the animation to finish before truly hiding the element
             setTimeout(() => {
                 popup.style.display = "none";
                 overlay.style.display = "none";
-            }, 400);
+            }, 400); // This duration should match your CSS transition duration for the popup
         }
 
         function checkInputs() {
