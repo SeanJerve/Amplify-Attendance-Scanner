@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>QR Attendance Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>QR Attendance Scanner</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         /* Modern CSS Custom Properties - Dark on White Glass */
@@ -27,7 +27,7 @@
             --button-background: var(--color-deep-blue); /* Darker button background */
             --button-hover-background: var(--color-dark-navy);
             --input-background: var(--color-white);
-            --input-border: var(--color-medium-blue);
+            --input-border: var(--color-medium-blue); /* Assuming this is defined, or use a specific color */
             --input-text-color: var(--color-dark-navy);
 
             /* Spacing Custom Properties */
@@ -71,6 +71,7 @@
             font-family: var(--font-primary);
             margin: var(--spacing-md) 0 var(--spacing-sm) 0; /* Use spacing variables */
             text-shadow: 0 0 10px var(--heading-shadow-color);
+            font-size: 1.3rem; /* Adjusted default font size for better consistency */
         }
 
         /* --- Global Glassmorphism Container Style --- */
@@ -88,8 +89,8 @@
             -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
             overflow: hidden; /* For gradient border effect and shine */
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth transitions */
-            margin: 0 auto; /* Center individual containers */
-            width: clamp(280px, 90vw, 400px); /* Responsive width applied globally here */
+            margin: 0 auto; /* Center individual containers in the flex column */
+            width: clamp(280px, 90vw, 400px); /* Responsive width applied globally */
         }
 
         .glass-container::before {
@@ -139,8 +140,8 @@
 
 
         #reader { 
-            /* Inherits most styles from .glass-container */
-            width: clamp(250px, 80vw, 350px); /* Responsive width for reader */
+            /* Inherits most styles from .glass-container implicitly via global styling */
+            width: clamp(250px, 80vw, 350px); /* Responsive width for reader, slightly smaller max */
             margin-bottom: var(--spacing-md); /* Specific margin for reader */
             overflow: hidden; /* Important for camera feed */
             box-shadow: /* Retain specific box-shadow for camera as it's animated */
@@ -152,6 +153,15 @@
             display: flex; /* Make it a flex container for centering video */
             justify-content: center;
             align-items: center;
+            aspect-ratio: 1 / 1; /* Maintain a square aspect ratio for the QR reader */
+            max-width: 90vw; /* Ensure it doesn't overflow on very small screens */
+        }
+
+        #reader video { /* Ensure the video feed fits within the reader container */
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--border-radius); /* Apply border radius to video as well */
         }
 
         #zoomSlider {
@@ -196,9 +206,10 @@
 
         #scannedText {
             margin-bottom: var(--spacing-md); /* Consistent margin */
-            /* Inherits glass-container styles */
+            /* Inherits glass-container styles due to the class */
             word-wrap: break-word; /* Ensure text wraps */
             color: var(--input-text-color); /* Apply text color */
+            text-align: left; /* Align text to left for readability */
         }
 
         /* Specific styling for the control section (label, select, button) */
@@ -302,16 +313,24 @@
             min-height: 100px; /* Ensure a minimum height for usability */
             width: clamp(280px, 90vw, 400px); /* Ensure it's responsive like other containers */
             padding: var(--container-padding); /* Apply container padding */
+            text-align: left; /* Ensure text aligns left in textarea */
         }
 
         textarea.glass-container::placeholder {
             color: rgba(12, 17, 29, 0.5); /* Slightly lighter placeholder */
         }
 
-        /* Ensure the :before and :after pseudo-elements also apply to textarea */
-        textarea.glass-container::before {
+        /* Ensure the :before and :after pseudo-elements also apply to textarea by reusing the glass-container styles */
+        textarea.glass-container::before,
+        textarea.glass-container::after {
             content: '';
             position: absolute;
+            /* Reset positioning for these specific elements if they inherit from .glass-container */
+            /* Otherwise, they would be relative to the textarea itself and not the original .glass-container */
+        }
+
+        /* Re-apply ::before for textarea to ensure the border effect */
+        textarea.glass-container::before {
             top: -2px;
             left: -2px;
             right: -2px;
@@ -321,23 +340,22 @@
                 transparent, 
                 var(--color-cyan)
             );
-            border-radius: var(--border-radius); /* Match textarea border-radius */
-            z-index: -1; /* Behind the main element */
+            border-radius: var(--border-radius);
+            z-index: -1;
             opacity: 0.8;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
+        /* Re-apply ::after for textarea to ensure the shine effect */
         textarea.glass-container::after {
-            content: '';
-            position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3); /* White shine color */
+            background: rgba(255, 255, 255, 0.3);
             transform: skewX(-30deg);
             transition: all 0.5s ease;
-            pointer-events: none; /* Allows clicks through */
+            pointer-events: none;
         }
 
         textarea.glass-container:hover {
@@ -372,6 +390,8 @@
             -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bounce effect */
             width: clamp(280px, 90vw, 450px); /* Responsive popup width */
+            max-height: 90vh; /* Prevent popup from overflowing on very small screens */
+            overflow-y: auto; /* Allow scrolling if content is too long */
         }
 
         #popup.show {
@@ -392,6 +412,7 @@
             border-color: var(--button-background);
             width: auto; /* Buttons inside popup don't need full width */
             margin-top: var(--spacing-md); /* Margin above OK button */
+            align-self: center; /* Center the button in the popup */
         }
 
         #popup button:hover {
@@ -408,6 +429,9 @@
             border-radius: 10px;
             margin: var(--spacing-sm) 0; /* Use spacing variable */
             border: 1px solid var(--color-medium-blue);
+            text-align: left; /* Align popup content text to left */
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+            word-break: break-all; /* Break long words */
         }
 
         #overlay {
@@ -452,9 +476,10 @@
         hr {
             border: none;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent); /* Darker HR gradient */
+            background: linear-gradient(90deg, transparent, var(--color-cyan), transparent); /* Cyan HR gradient */
             margin: var(--spacing-lg) 0; /* Use spacing variable for more prominent separator */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: clamp(200px, 70vw, 300px); /* Make HR responsive */
         }
 
         label {
@@ -462,6 +487,8 @@
             font-weight: 700;
             font-family: var(--font-secondary);
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            text-align: left; /* Align labels to the left */
+            width: 100%; /* Ensure label takes full width in flex container */
         }
 
         /* Subtle Animations */
@@ -471,6 +498,7 @@
         }
 
         /* Responsive Design */
+        /* Tablet and larger phones */
         @media (max-width: 768px) {
             body {
                 padding: var(--spacing-md); 
@@ -483,6 +511,7 @@
             }
 
             h3 {
+                font-size: 1.2rem;
                 margin: var(--spacing-md) 0 var(--spacing-sm) 0;
             }
 
@@ -493,6 +522,11 @@
 
             #reader {
                 width: clamp(250px, 85vw, 350px); 
+                margin-bottom: var(--spacing-md);
+            }
+
+            #zoomSlider {
+                width: clamp(180px, 65vw, 250px); /* Slightly wider on mid-size screens */
             }
 
             #scannedText, #status {
@@ -513,6 +547,7 @@
             }
         }
 
+        /* Smaller phones (portrait) */
         @media (max-width: 600px) {
             body {
                 padding: var(--spacing-sm); 
@@ -532,7 +567,7 @@
 
             .glass-container {
                 padding: 12px; 
-                width: calc(100% - var(--spacing-md)); 
+                width: calc(100% - var(--spacing-md)); /* Full width with outer padding */
                 border-radius: 15px; 
             }
 
@@ -592,9 +627,11 @@
 
             hr {
                 margin: var(--spacing-md) 0;
+                width: calc(100% - var(--spacing-md) * 2); /* Adjust HR width for smaller screens */
             }
         }
 
+        /* Very small phones (e.g., iPhone SE) */
         @media (max-width: 400px) {
             body {
                 padding: var(--spacing-xs); 
@@ -611,13 +648,9 @@
                 margin: var(--spacing-xs) 0;
             }
 
-            .glass-container, #reader, #zoomSlider, #scannedText, #status, #popup {
-                width: calc(100% - var(--spacing-sm)); 
+            .glass-container, #reader, #zoomSlider, #scannedText, #status, #popup, textarea.glass-container {
+                width: calc(100% - var(--spacing-sm)); /* Use even tighter padding for full width appearance */
                 padding: 10px; 
-            }
-
-            textarea.glass-container { /* Specific width for textarea on extra small screens */
-                width: calc(100% - var(--spacing-sm));
             }
             
             select, button {
@@ -646,6 +679,7 @@
 
             hr {
                 margin: var(--spacing-sm) 0;
+                width: calc(100% - var(--spacing-sm) * 2); /* Adjust HR width for very small screens */
             }
         }
     </style>
@@ -673,7 +707,7 @@
 
     <hr>
     <h3>Manual Input</h3>
-    <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
+    <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" oninput="checkInputs()" class="glass-container"></textarea>
 
     <div id="overlay"></div>
     <div id="popup">
@@ -685,7 +719,7 @@
     <div id="loading">Sending attendance... Please wait.</div>
 
     <script>
-        const endpoint = "https://script.google.com/macros/s/AKfycbyNtSknNXOtXrbnwO7WIXcVNJf5KI-M0T0wvIguLiVTjgnc8cnGnUooSCmDsUuYyPWo/exec";
+        const endpoint = "https://script.google.com/macros/s/AKfycbyNtSknNXOtXrbnwO7WIXcVNJf5KI-M0T0wvIguLiVTjgnc8cnGnUooSCnDsUuYyPWo/exec";
         const scanner = new Html5Qrcode("reader");
         let videoTrack = null;
         let lastScanned = "";
@@ -746,6 +780,7 @@
                     statusEl.innerText = msg;
                     document.getElementById("scannedText").innerText = "No scan yet...";
                     document.getElementById("manualInput").value = "";
+                    document.getElementById("yearLevel").value = ""; // Clear year level after submission
                     lastScanned = "";
                 }).catch(() => {
                     statusEl.innerText = "Failed to send";
@@ -766,7 +801,6 @@
         }
 
         function showPopup(text) {
-            // Updated to use classlist for animation control
             const popup = document.getElementById("popup");
             const overlay = document.getElementById("overlay");
             document.getElementById("popupContent").innerText = text;
@@ -778,7 +812,6 @@
         }
 
         function closePopup() {
-            // Updated to use classlist for animation control
             const popup = document.getElementById("popup");
             const overlay = document.getElementById("overlay");
             popup.classList.remove("show");
@@ -792,9 +825,14 @@
 
         function checkInputs() {
             const manualInput = document.getElementById("manualInput").value.trim();
-            const enable = manualInput || lastScanned;
+            const yearLevel = document.getElementById("yearLevel").value;
+            const enable = (manualInput || lastScanned) && yearLevel; // Enable only if data AND year level selected
             document.getElementById("submitBtn").disabled = !enable;
         }
+
+        // Event listener for year level change
+        document.getElementById("yearLevel").addEventListener("change", checkInputs);
+
 
         Html5Qrcode.getCameras().then(devices => {
             if (devices.length) {
@@ -805,17 +843,21 @@
 
                 scanner.start(
                     { deviceId: { exact: backCam.id } },
-                    { fps: 10, qrbox: 250 },
-                    onScanSuccess
-                ).then(() => enableZoomControl());
+                    { fps: 10, qrbox: { width: 250, height: 250 } }, 
+                    onScanSuccess,
+                    (errorMessage) => {  } 
+                ).then(() => enableZoomControl())
+                .catch(err => {
+                    document.getElementById("status").innerText = "Camera access denied or error: " + err;
+                });
             } else {
-                document.getElementById("status").innerText = "No camera found.";
+                document.getElementById("status").innerText = "No camera found. Please use manual input.";
             }
         });
 
         function enableZoomControl() {
             setTimeout(() => {
-                const video = document.querySelector("video");
+                const video = document.querySelector("#reader video"); 
                 if (video && video.srcObject) {
                     videoTrack = video.srcObject.getVideoTracks()[0];
                     const caps = videoTrack.getCapabilities?.();
@@ -832,7 +874,7 @@
                         };
                     }
                 }
-            }, 1000);
+            }, 1000); 
         }
     </script>
 </body>
