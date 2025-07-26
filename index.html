@@ -6,6 +6,7 @@
     <title>QR Attendance Scanner</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
+        /* Modern CSS Custom Properties - Dark on White Glass */
         :root {
             --color-white: #ffffff;
             --color-light-gray: #e9ecef;
@@ -15,27 +16,28 @@
             --color-cyan: #00DCFD;
             --color-black: #000000;
             
-            --font-primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-            --font-secondary: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+            --font-primary: 'Arial Black', Arial, sans-serif;
+            --font-secondary: 'Arial', sans-serif;
             
             --border-radius: 20px;
-            --glass-blur: 25px;
-            --glass-background: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --text-color: var(--color-dark-navy);
-            --heading-shadow-color: rgba(0, 0, 0, 0.15);
-            --button-text-color: var(--color-white);
-            --button-background: var(--color-deep-blue);
+            --glass-blur: 25px; /* Increased blur for more prominent glass effect */
+            --glass-background: rgba(255, 255, 255, 0.15); /* Lighter background for white theme */
+            --glass-border: rgba(255, 255, 255, 0.4); /* Lighter border for white theme */
+            --text-color: var(--color-dark-navy); /* Default text color for dark-on-white */
+            --heading-shadow-color: rgba(0, 0, 0, 0.15); /* Softer shadow for headings */
+            --button-text-color: var(--color-white); /* White text on dark buttons */
+            --button-background: var(--color-deep-blue); /* Darker button background */
             --button-hover-background: var(--color-dark-navy);
             --input-background: var(--color-white);
             --input-border: var(--color-medium-blue);
             --input-text-color: var(--color-dark-navy);
 
-            --spacing-xs: clamp(3px, 1vw, 5px);
+            /* Responsive Spacing Custom Properties */
+            --spacing-xs: clamp(3px, 1vw, 5px); /* Extra small spacing */
             --spacing-sm: clamp(6px, 2vw, 10px);
-            --spacing-md: clamp(10px, 2.5vw, 15px);
-            --spacing-lg: clamp(15px, 4vw, 25px);
-            --container-padding: clamp(12px, 3vw, 18px);
+            --spacing-md: clamp(10px, 2.5vw, 15px); /* Slightly reduced default medium spacing */
+            --spacing-lg: clamp(15px, 4vw, 25px); /* Slightly reduced default large spacing */
+            --container-padding: clamp(12px, 3vw, 18px); /* Slightly reduced default padding for glass containers */
         }
 
         * {
@@ -47,51 +49,50 @@
         body { 
             font-family: var(--font-secondary); 
             text-align: center; 
-            padding: var(--spacing-md);
-            background: linear-gradient(135deg, var(--color-white), var(--color-light-gray));
-            color: var(--text-color);
+            padding: var(--spacing-md); /* Use spacing variable */
+            background: linear-gradient(135deg, var(--color-white), var(--color-light-gray)); /* White background gradient */
+            color: var(--text-color); /* Default text color */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            gap: var(--spacing-md);
+            justify-content: flex-start; /* Align items to the start for better flow on small screens */
+            gap: var(--spacing-md); /* Add gap for consistent spacing between main elements */
         }
 
         h2 {
-            color: var(--color-dark-navy);
+            color: var(--color-dark-navy); /* Darker heading color */
             font-family: var(--font-primary);
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-md); /* Use spacing variable */
             text-shadow: 0 0 15px var(--heading-shadow-color);
             font-size: clamp(1.4rem, 5vw, 2.2rem);
-            font-weight: 700;
         }
 
         h3 {
-            color: var(--color-dark-navy);
+            color: var(--color-dark-navy); /* Darker heading color */
             font-family: var(--font-primary);
-            margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+            margin: var(--spacing-md) 0 var(--spacing-sm) 0; /* Use spacing variables */
             text-shadow: 0 0 10px var(--heading-shadow-color);
             font-size: clamp(1rem, 4vw, 1.2rem);
-            font-weight: 600;
         }
 
+        /* --- Global Glassmorphism Container Style --- */
         .glass-container {
             position: relative;
-            background: var(--glass-background);
-            border: 2px solid var(--glass-border);
+            background: var(--glass-background); /* White glass background */
+            border: 2px solid var(--glass-border); /* White glass border */
             border-radius: var(--border-radius);
-            padding: var(--container-padding);
+            padding: var(--container-padding); /* Use container padding variable */
             box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.15),
+                0 15px 35px rgba(0, 0, 0, 0.15), /* Softer shadow */
                 0 5px 15px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            margin: 0 auto;
-            width: clamp(280px, 90vw, 400px);
+                inset 0 1px 0 rgba(255, 255, 255, 0.8); /* Stronger inner highlight */
+            backdrop-filter: blur(var(--glass-blur)); /* Apply blur */
+            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
+            overflow: hidden; /* For gradient border effect and shine */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth transitions */
+            margin: 0 auto; /* Center individual containers */
+            width: clamp(280px, 90vw, 400px); /* Responsive width applied globally here */
         }
 
         .glass-container::before {
@@ -106,12 +107,13 @@
                 transparent, 
                 var(--color-cyan)
             );
-            border-radius: var(--border-radius);
+            border-radius: var(--border-radius); /* Match container border-radius */
             z-index: -1;
-            opacity: 0.8;
+            opacity: 0.8; /* Always visible */
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
+        /* Shine animation on hover */
         .glass-container::after {
             content: '';
             position: absolute;
@@ -119,48 +121,53 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.3); /* White shine color */
             transform: skewX(-30deg);
             transition: all 0.5s ease;
-            pointer-events: none;
+            pointer-events: none; /* Allows clicks through the shine */
         }
 
         .glass-container:hover {
-            transform: translateY(-3px) scale(1.02);
+            transform: translateY(-3px) scale(1.02); /* Slight scale on hover */
             box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.25),
+                0 20px 40px rgba(0, 0, 0, 0.25), /* Stronger shadow on hover */
                 0 8px 20px rgba(0, 220, 253, 0.08),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .glass-container:hover::after {
-            left: 100%;
+            left: 100%; /* Move shine across */
         }
+        /* --- End Global Glassmorphism Container Style --- */
 
         #reader { 
-            width: clamp(250px, 80vw, 350px);
+            /* Inherits most styles from .glass-container */
+            width: clamp(250px, 80vw, 350px); /* Responsive width for reader */
+            /* Force 1:1 aspect ratio */
             aspect-ratio: 1 / 1; 
-            margin-bottom: var(--spacing-md);
-            overflow: hidden;
-            box-shadow:
+            margin-bottom: var(--spacing-md); /* Specific margin for reader */
+            overflow: hidden; /* Important for camera feed */
+            box-shadow: /* Retain specific box-shadow for camera as it's animated */
                 0 0 30px rgba(0, 0, 0, 0.1),
                 0 15px 35px rgba(0, 0, 0, 0.2);
             animation: glow 3s ease-in-out infinite;
             position: relative;
-            background-color: var(--color-black);
-            display: flex;
+            background-color: var(--color-black); /* Ensure a solid background for video */
+            display: flex; /* Make it a flex container for centering video */
             justify-content: center;
             align-items: center;
         }
 
+        /* Make video and canvas inside reader responsive */
         #reader video,
         #reader canvas {
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover;
+            object-fit: cover; /* Cover the container, cropping as needed */
             border-radius: calc(var(--border-radius) - 4px);
         }
 
+        /* Fix QR scanner overlay positioning - make it inside the camera view */
         #reader__scan_region {
             position: relative !important;
             width: 100% !important;
@@ -169,10 +176,12 @@
             overflow: hidden;
         }
 
+        /* Style the QR box overlay to be inside the camera view */
         #reader__scan_region img[alt="Info icon"] {
-            display: none !important;
+            display: none !important; /* Hide the info icon */
         }
 
+        /* Position the QR scanning box properly inside the camera view */
         #reader__scan_region video {
             width: 100% !important;
             height: 100% !important;
@@ -180,10 +189,12 @@
             border-radius: calc(var(--border-radius) - 4px);
         }
 
+        /* Fix the dashboard/controls positioning */
         #reader__dashboard_section {
-            display: none !important;
+            display: none !important; /* Hide the default dashboard as we have our own controls */
         }
 
+        /* Style the scanning region border */
         #reader__scan_region {
             border: 3px solid var(--color-cyan) !important;
             box-shadow: 
@@ -191,6 +202,7 @@
                 inset 0 0 20px rgba(0, 220, 253, 0.1) !important;
         }
 
+        /* Fix the QR code scanning area overlay */
         #reader div[style*="position: absolute"] {
             border: 2px solid var(--color-cyan) !important;
             border-radius: 8px !important;
@@ -199,137 +211,22 @@
                 inset 0 0 15px rgba(0, 220, 253, 0.2) !important;
         }
 
-        .scanner-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            z-index: 10;
-            border-radius: calc(var(--border-radius) - 4px);
-            overflow: hidden;
-        }
-
-        .scanner-frame {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 200px;
-            height: 200px;
-            transform: translate(-50%, -50%);
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .scanner-frame::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                linear-gradient(to right, rgba(0, 0, 0, 0.6) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.6) 100%),
-                linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.6) 100%);
-            pointer-events: none;
-        }
-
-        .corner {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #ffffff;
-            border-radius: 3px;
-        }
-
-        .corner.top-left {
-            top: 0;
-            left: 0;
-            border-right: none;
-            border-bottom: none;
-        }
-
-        .corner.top-right {
-            top: 0;
-            right: 0;
-            border-left: none;
-            border-bottom: none;
-        }
-
-        .corner.bottom-left {
-            bottom: 0;
-            left: 0;
-            border-right: none;
-            border-top: none;
-        }
-
-        .corner.bottom-right {
-            bottom: 0;
-            right: 0;
-            border-left: none;
-            border-top: none;
-        }
-
-        .scan-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #00DCFD, transparent);
-            animation: scanLine 2s ease-in-out infinite;
-            border-radius: 1px;
-            box-shadow: 0 0 10px rgba(0, 220, 253, 0.8);
-        }
-
-        @keyframes scanLine {
-            0% { top: 0; opacity: 1; }
-            50% { opacity: 1; }
-            100% { top: calc(100% - 2px); opacity: 1; }
-        }
-
-        .scanner-text {
-            position: absolute;
-            bottom: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #ffffff;
-            font-family: var(--font-secondary);
-            font-size: 14px;
-            font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            white-space: nowrap;
-        }
-
-        .scanner-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(
-                circle at center,
-                transparent 140px,
-                rgba(0, 0, 0, 0.6) 200px
-            );
-        }
-
         #zoomSlider {
-            width: clamp(180px, 60vw, 250px);
-            margin-bottom: var(--spacing-md);
+            width: clamp(180px, 60vw, 250px); /* Responsive width for slider */
+            margin-bottom: var(--spacing-md); /* Margin after slider */
             display: block;
             appearance: none;
-            height: clamp(6px, 1.5vw, 8px);
-            background: rgba(0, 0, 0, 0.15);
+            height: clamp(6px, 1.5vw, 8px); /* Thicker slider */
+            background: rgba(0, 0, 0, 0.15); /* Darker track */
             border-radius: 4px;
             outline: none;
         }
 
         #zoomSlider::-webkit-slider-thumb {
             appearance: none;
-            width: clamp(20px, 4vw, 24px);
+            width: clamp(20px, 4vw, 24px); /* Larger thumb */
             height: clamp(20px, 4vw, 24px);
-            background: var(--color-deep-blue);
+            background: var(--color-deep-blue); /* Dark thumb */
             border: 2px solid var(--color-cyan);
             border-radius: 50%;
             cursor: pointer;
@@ -355,54 +252,57 @@
         }
 
         #scannedText {
-            margin-bottom: var(--spacing-md);
-            word-wrap: break-word;
-            color: var(--input-text-color);
-            min-height: clamp(60px, 12vw, 80px);
+            margin-bottom: var(--spacing-md); /* Consistent margin */
+            /* Inherits glass-container styles */
+            word-wrap: break-word; /* Ensure text wraps */
+            color: var(--input-text-color); /* Apply text color */
+            min-height: clamp(60px, 12vw, 80px); /* Ensure minimum height */
             font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
-        .control-section {
-            display: flex;
+        /* Specific styling for the control section (label, select, button) */
+        .control-section { /* Changed from .control-navbar to .control-section for better semantic clarity */
+            display: flex; /* Ensure flexbox for internal layout */
             flex-direction: column;
-            gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-md);
+            gap: var(--spacing-sm); /* Smaller gap for internal elements */
+            margin-bottom: var(--spacing-md); /* Consistent margin */
+            /* Inherits glass-container styles */
         }
 
         select, button { 
             padding: clamp(8px, 2.5vw, 12px) clamp(15px, 4vw, 20px); 
-            margin: 0;
+            margin: 0; /* Remove default margins to use gap */
             border-radius: clamp(12px, 3vw, 18px);
-            border: 2px solid var(--color-deep-blue);
+            border: 2px solid var(--color-deep-blue); /* Darker border */
             font-family: var(--font-secondary);
-            font-weight: 600;
+            font-weight: 700;
             font-size: clamp(0.7rem, 2.2vw, 0.85rem);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            background: var(--button-background);
-            color: var(--button-text-color);
+            background: var(--button-background); /* Darker button background */
+            color: var(--button-text-color); /* White text */
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            min-height: clamp(40px, 8vw, 48px);
+            width: 100%; /* Make buttons and select fill container width */
+            min-height: clamp(40px, 8vw, 48px); /* Touch-friendly minimum height */
         }
 
         select:hover, button:hover:not(:disabled) {
-            background: var(--button-hover-background);
+            background: var(--button-hover-background); /* Even darker on hover */
             color: var(--color-white);
             transform: translateY(-2px) scale(1.05);
-            border-color: var(--color-cyan);
+            border-color: var(--color-cyan); /* Cyan border on hover */
             box-shadow: 
-                0 8px 25px rgba(0, 220, 253, 0.2),
+                0 8px 25px rgba(0, 220, 253, 0.2), /* Cyan glow on hover */
                 0 0 20px rgba(0, 220, 253, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         button:disabled {
-            background: rgba(12, 17, 29, 0.3);
+            background: rgba(12, 17, 29, 0.3); /* Darker disabled background */
             color: rgba(255, 255, 255, 0.6);
             cursor: not-allowed;
             transform: none;
@@ -430,43 +330,48 @@
         }
 
         #status { 
-            font-weight: 600; 
+            font-weight: bold; 
             color: var(--color-dark-navy);
-            margin: var(--spacing-md) auto;
-            word-wrap: break-word;
+            /* Inherits glass-container styles */
+            margin: var(--spacing-md) auto; /* Apply consistent margin and center */
+            word-wrap: break-word; /* Ensure text wraps */
             min-height: clamp(50px, 10vw, 70px);
             font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
+        /* Specific styles for textarea within a glass-container */
         textarea.glass-container {
-            appearance: none;
+            /* Override default textarea styles */
+            appearance: none; /* Remove default browser styling */
             -webkit-appearance: none;
             -moz-appearance: none;
             
-            background: var(--glass-background);
-            border: 2px solid var(--glass-border);
-            border-radius: var(--border-radius);
+            /* Apply glass container styles directly */
+            background: var(--glass-background); /* Explicitly set for textarea */
+            border: 2px solid var(--glass-border); /* Explicitly set for textarea */
+            border-radius: var(--border-radius); /* Explicitly set for textarea */
             box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.15),
+                0 15px 35px rgba(0, 0, 0, 0.15), /* Explicitly set for textarea */
                 0 5px 15px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
+            backdrop-filter: blur(var(--glass-blur)); /* Explicitly set for textarea */
+            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
             
-            margin-top: var(--spacing-sm);
+            margin-top: var(--spacing-sm); /* Adjust top margin for manual input */
             font-family: var(--font-secondary);
-            resize: vertical;
-            color: var(--input-text-color);
-            min-height: clamp(80px, 20vw, 100px);
-            width: clamp(280px, 90vw, 400px);
-            padding: var(--container-padding);
+            resize: vertical; /* Allow vertical resizing */
+            color: var(--input-text-color); /* Apply text color */
+            min-height: clamp(80px, 20vw, 100px); /* Ensure a minimum height for usability */
+            width: clamp(280px, 90vw, 400px); /* Ensure it's responsive like other containers */
+            padding: var(--container-padding); /* Apply container padding */
             font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
         textarea.glass-container::placeholder {
-            color: rgba(12, 17, 29, 0.5);
+            color: rgba(12, 17, 29, 0.5); /* Slightly lighter placeholder */
         }
 
+        /* Ensure the :before and :after pseudo-elements also apply to textarea */
         textarea.glass-container::before {
             content: '';
             position: absolute;
@@ -479,8 +384,8 @@
                 transparent, 
                 var(--color-cyan)
             );
-            border-radius: var(--border-radius);
-            z-index: -1;
+            border-radius: var(--border-radius); /* Match textarea border-radius */
+            z-index: -1; /* Behind the main element */
             opacity: 0.8;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
@@ -492,10 +397,10 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.3); /* White shine color */
             transform: skewX(-30deg);
             transition: all 0.5s ease;
-            pointer-events: none;
+            pointer-events: none; /* Allows clicks through */
         }
 
         textarea.glass-container:hover {
@@ -512,23 +417,23 @@
 
         #popup {
             display: none; 
-            background: var(--glass-background);
-            border: 2px solid var(--glass-border);
+            background: var(--glass-background); /* White glass background */
+            border: 2px solid var(--glass-border); /* White glass border */
             border-radius: var(--border-radius);
-            padding: var(--container-padding);
+            padding: var(--container-padding); /* Use container padding for popup */
             position: fixed; 
             top: 50%; 
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9); /* Initial scale for animation */
+            opacity: 0; /* Initial opacity for animation */
             z-index: 9999; 
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.25),
+                0 25px 50px rgba(0, 0, 0, 0.25), /* Stronger shadow */
                 0 0 30px rgba(0, 220, 253, 0.1);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            width: clamp(280px, 90vw, 450px);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bounce effect */
+            width: clamp(280px, 90vw, 450px); /* Responsive popup width */
             max-height: 80vh;
             overflow-y: auto;
         }
@@ -541,7 +446,7 @@
 
         #popup h3 {
             color: var(--color-dark-navy);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm); /* Adjusted margin */
             text-shadow: none;
             font-size: clamp(1rem, 3vw, 1.2rem);
         }
@@ -550,8 +455,8 @@
             background: var(--button-background);
             color: var(--button-text-color);
             border-color: var(--button-background);
-            width: auto;
-            margin-top: var(--spacing-md);
+            width: auto; /* Buttons inside popup don't need full width */
+            margin-top: var(--spacing-md); /* Margin above OK button */
             min-width: clamp(80px, 20vw, 120px);
         }
 
@@ -569,9 +474,9 @@
             left: 0;
             width: 100%; 
             height: 100%; 
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.6); /* Darker overlay for white theme */
             z-index: 9998;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px); /* Stronger blur */
             -webkit-backdrop-filter: blur(8px);
             transition: opacity 0.4s ease;
             opacity: 0;
@@ -588,7 +493,7 @@
             left: 0;
             width: 100%; 
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.9); /* Darker loading overlay */
             z-index: 9999;
             color: var(--color-white); 
             font-size: clamp(16px, 4vw, 20px);
@@ -599,32 +504,33 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             text-shadow: 0 0 20px rgba(0, 220, 253, 0.3);
-            font-weight: 600;
         }
 
         hr {
             border: none;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent);
-            margin: var(--spacing-lg) 0;
+            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent); /* Darker HR gradient */
+            margin: var(--spacing-lg) 0; /* Use spacing variable for more prominent separator */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: clamp(280px, 90vw, 400px);
         }
 
         label {
-            color: var(--color-dark-navy);
-            font-weight: 600;
+            color: var(--color-dark-navy); /* Darker label color */
+            font-weight: 700;
             font-family: var(--font-secondary);
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             font-size: clamp(0.8rem, 2.2vw, 1rem);
         }
 
+        /* Subtle Animations */
         @keyframes glow {
             0%, 100% { box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); }
             50% { box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); }
         }
 
+        /* Touch device optimizations */
         @media (hover: none) and (pointer: coarse) {
             .glass-container:hover {
                 transform: none;
@@ -639,6 +545,7 @@
             }
         }
 
+        /* Landscape orientation on mobile */
         @media (orientation: landscape) and (max-height: 500px) {
             body {
                 gap: var(--spacing-sm);
@@ -650,11 +557,13 @@
             }
             
             #reader {
+                /* When in landscape and max-height 500px, make it less tall to fit */
                 height: clamp(120px, 25vh, 180px);
-                width: auto;
+                width: auto; /* Allow width to adjust based on height for 1:1 */
             }
         }
 
+        /* Extra small screens */
         @media (max-width: 320px) {
             body {
                 padding: 8px;
@@ -672,6 +581,7 @@
             
             #reader {
                 width: calc(100vw - 20px);
+                /* Height will be set by aspect-ratio */
             }
             
             #zoomSlider {
@@ -679,37 +589,51 @@
             }
         }
 
+        /* Large screens optimization */
         @media (min-width: 1200px) {
             .glass-container, textarea.glass-container {
                 width: 450px;
             }
             
             #reader {
-                width: 380px;
-                height: 380px;
+                width: 380px; /* Adjust as needed for larger screens while maintaining 1:1 */
+                height: 380px; /* Height explicitly set to match width for consistency on large screens */
             }
             
             #zoomSlider {
                 width: 300px;
             }
         }
+
+        /* Scanner guide overlay */
+#reader .scanner-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    height: 60%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(0, 220, 253, 0.9);
+    border-radius: 12px;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 0 20px rgba(0, 220, 253, 0.4), 0 0 10px rgba(0, 220, 253, 0.3) inset;
+    backdrop-filter: blur(2px);
+}
+
+/* Ensure camera container positions child elements correctly */
+#reader {
+    position: relative;
+    overflow: hidden;
+}
+
     </style>
 </head>
 <body>
     <h2>QR Attendance Scanner</h2>
-    <div id="reader" class="glass-container">
-        <div class="scanner-overlay">
-            <div class="scanner-background"></div>
-            <div class="scanner-frame">
-                <div class="corner top-left"></div>
-                <div class="corner top-right"></div>
-                <div class="corner bottom-left"></div>
-                <div class="corner bottom-right"></div>
-                <div class="scan-line"></div>
-                <div class="scanner-text">Position QR code here</div>
-            </div>
-        </div>
-    </div>
+    <div id="reader" class="glass-container"></div>
+    <div class="scanner-overlay"></div>
+
     <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
 
     <pre id="scannedText" class="glass-container">No scan yet...</pre>
@@ -747,6 +671,30 @@
         let videoTrack = null;
         let lastScanned = "";
 
+        // Function to send data to Google Apps Script
+        function sendToScript(data) {
+            document.getElementById("loading").style.display = "flex";
+
+            fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: data
+            }).then(res => res.text())
+                .then(msg => {
+                    document.getElementById("status").innerText = msg;
+                    document.getElementById("submitBtn").disabled = true;
+                    document.getElementById("scannedText").innerText = "No scan yet...";
+                    document.getElementById("manualInput").value = "";
+                    document.getElementById("yearLevel").value = ""; // Clear year level after successful submission
+                    lastScanned = "";
+                }).catch((error) => { // Catch the error object
+                    console.error("Error sending data:", error); // Log the actual error
+                    document.getElementById("status").innerText = "Failed to send: " + error.message; // Display specific error
+                }).finally(() => {
+                    document.getElementById("loading").style.display = "none";
+                });
+        }
+
         // Function to handle attendance submission
         function submitAttendance() {
             const yearLevel = document.getElementById("yearLevel").value;
@@ -783,14 +731,14 @@
                     statusEl.innerText = msg;
                     document.getElementById("scannedText").innerText = "No scan yet...";
                     document.getElementById("manualInput").value = "";
-                    document.getElementById("yearLevel").value = "";
+                    document.getElementById("yearLevel").value = ""; // Clear year level after successful submission
                     lastScanned = "";
-                }).catch((error) => {
-                    console.error("Error sending data:", error);
-                    statusEl.innerText = "Failed to send: " + error.message;
+                }).catch((error) => { // Catch the error object
+                    console.error("Error sending data:", error); // Log the actual error
+                    statusEl.innerText = "Failed to send: " + error.message; // Display specific error
                 }).finally(() => {
                     document.getElementById("loading").style.display = "none";
-                    submitBtn.disabled = true;
+                    submitBtn.disabled = true; // Keep disabled until new scan/input
                 });
 
             closePopup();
@@ -801,7 +749,7 @@
             lastScanned = decodedText;
             document.getElementById("scannedText").innerText = decodedText;
             document.getElementById("status").innerText = "✅ QR scanned. Select year level.";
-            checkInputs();
+            checkInputs(); // Re-enable submit button if conditions met
             showPopup(decodedText);
         }
 
@@ -825,14 +773,13 @@
             setTimeout(() => {
                 popup.style.display = "none";
                 overlay.style.display = "none";
-            }, 400);
+            }, 400); // This duration should match your CSS transition duration for the popup
         }
 
         // Check if manual input or scanned text is present to enable/disable submit button
         function checkInputs() {
             const manualInput = document.getElementById("manualInput").value.trim();
-            const yearLevel = document.getElementById("yearLevel").value;
-            const enable = (manualInput || lastScanned) && yearLevel;
+            const enable = manualInput || lastScanned;
             document.getElementById("submitBtn").disabled = !enable;
         }
 
@@ -849,16 +796,19 @@
                     { deviceId: { exact: backCam.id } },
                     { 
                         fps: 10, 
-                        qrbox: { width: 250, height: 250 }
+                        qrbox: { width: 250, height: 250 } // Explicitly set square scanning box
                     },
                     onScanSuccess,
-                    (errorMessage) => {
+                    (errorMessage) => { // Error callback for scanner
                         console.warn(`QR Code scanning error: ${errorMessage}`);
+                        // You can update a status message here if needed, but avoid spamming
                     }
                 ).then(() => {
+                    // Start enabled zoom control after scanner successfully starts
                     enableZoomControl();
                     document.getElementById("status").innerText = "Scanning ready. Look for a QR code.";
                 }).catch(err => {
+                    // Catch errors related to starting the camera
                     let statusMessage = "Failed to start camera.";
                     if (err.name === "NotAllowedError") {
                         statusMessage = "Camera access denied. Please allow camera in browser settings.";
@@ -874,6 +824,7 @@
                 document.getElementById("status").innerText = "No camera found on this device.";
             }
         }).catch(err => {
+            // Catch errors related to getting camera devices
             document.getElementById("status").innerText = "Error accessing cameras. Make sure you're on HTTPS.";
             console.error("Get cameras error:", err);
         });
@@ -891,22 +842,27 @@
                         slider.min = caps.zoom.min;
                         slider.max = caps.zoom.max;
                         slider.step = caps.zoom.step || 0.1;
-                        slider.value = caps.zoom.min;
+                        slider.value = caps.zoom.min; // Start at minimum zoom
                         slider.disabled = false;
                         slider.oninput = () => {
                             videoTrack.applyConstraints({ advanced: [{ zoom: parseFloat(slider.value) }] })
                                 .catch(e => console.error("Error setting zoom:", e));
                         };
                     } else {
+                        // If zoom is not supported, disable the slider and hide if preferred
                         slider.disabled = true;
+                        // You might want to hide the slider if zoom is not available
+                        // slider.style.display = 'none'; 
                     }
                 }
-            }, 1000);
+            }, 1000); // Give a moment for video stream to initialize
         }
 
         // Listener for year level selection to enable/disable submit button
         document.getElementById("yearLevel").addEventListener("change", checkInputs);
 
+        // Initial check on load
+        checkInputs();
     </script>
 </body>
 </html>
