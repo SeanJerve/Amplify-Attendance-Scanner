@@ -19,7 +19,7 @@
     <div class="control-section glass-container">
         <label for="yearLevel">Select Year Level:</label>
         <select id="yearLevel">
-            <option value="">-- Select --</option>
+            <option value="">Select</option>
             <option value="1st Year">1st Year</option>
             <option value="2nd Year">2nd Year</option>
             <option value="3rd Year">3rd Year</option>
@@ -32,7 +32,7 @@
 
     <hr>
     <h3>Manual Input</h3>
-    <textarea id="manualInput" placeholder="Paste QR data here..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
+    <textarea id="manualInput" placeholder="Paste QR Data here. ex.1234-1234-1234JUAN DELA CRUZCOLLEGE OF ENGINEERING..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
 
     <div id="overlay"></div>
     <div id="popup">
@@ -45,4 +45,23 @@
 
     <script src="script.js"></script>
 </body>
+<footer class="glass-container">
+  <div class="footer-container">
+    <div class="brand-header">
+      <div class="logo-placeholder">
+        <img src="saentax.png" alt="Saentax Logo">
+      </div>
+      <span class="brand-name">Saentax</span>
+    </div>
+
+    <span class="brand-divider">|</span>
+
+    <div class="brand-header">
+      <div class="logo-placeholder">
+        <img src="amplify.svg" alt="Amplify Logo">
+      </div>
+      <span class="brand-name">Amplify</span>
+    </div>
+  </div>
+</footer>
 </html>
