@@ -1,6 +1,6 @@
-        :root {
+:root {
             --color-white: #ffffff;
-            --color-light-gray: #e9ecef;
+            --color-light-gray: #e3e3e3;
             --color-dark-navy: #0C111D;
             --color-deep-blue: #1a1f2e;
             --color-medium-blue: #6c757d;
@@ -11,24 +11,23 @@
             --font-secondary: 'Arial', sans-serif;
             
             --border-radius: 20px;
-            --glass-blur: 25px; /* Increased blur for more prominent glass effect */
-            --glass-background: rgba(255, 255, 255, 0.15); /* Lighter background for white theme */
-            --glass-border: rgba(255, 255, 255, 0.4); /* Lighter border for white theme */
-            --text-color: var(--color-dark-navy); /* Default text color for dark-on-white */
-            --heading-shadow-color: rgba(0, 0, 0, 0.15); /* Softer shadow for headings */
-            --button-text-color: var(--color-white); /* White text on dark buttons */
-            --button-background: var(--color-deep-blue); /* Darker button background */
+            --glass-blur: 25px; 
+            --glass-background: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-color: var(--color-dark-navy); 
+            --heading-shadow-color: rgba(0, 0, 0, 0.15);
+            --button-text-color: var(--color-white);
+            --button-background: var(--color-deep-blue);
             --button-hover-background: var(--color-dark-navy);
             --input-background: var(--color-white);
             --input-border: var(--color-medium-blue);
             --input-text-color: var(--color-dark-navy);
 
-            /* Responsive Spacing Custom Properties */
-            --spacing-xs: clamp(3px, 1vw, 5px); /* Extra small spacing */
+            --spacing-xs: clamp(3px, 1vw, 5px); 
             --spacing-sm: clamp(6px, 2vw, 10px);
-            --spacing-md: clamp(10px, 2.5vw, 15px); /* Slightly reduced default medium spacing */
-            --spacing-lg: clamp(15px, 4vw, 25px); /* Slightly reduced default large spacing */
-            --container-padding: clamp(12px, 3vw, 18px); /* Slightly reduced default padding for glass containers */
+            --spacing-md: clamp(10px, 2.5vw, 15px); 
+            --spacing-lg: clamp(15px, 4vw, 25px);
+            --container-padding: clamp(12px, 3vw, 18px);
         }
 
         * {
@@ -40,50 +39,49 @@
         body { 
             font-family: var(--font-secondary); 
             text-align: center; 
-            padding: var(--spacing-md); /* Use spacing variable */
-            background: linear-gradient(135deg, var(--color-white), var(--color-light-gray)); /* White background gradient */
-            color: var(--text-color); /* Default text color */
+            padding: var(--spacing-md); 
+            background: linear-gradient(135deg, var(--color-white), var(--color-light-gray));
+            color: var(--text-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Align items to the start for better flow on small screens */
-            gap: var(--spacing-md); /* Add gap for consistent spacing between main elements */
+            justify-content: flex-start;
+            gap: var(--spacing-md);
         }
 
         h2 {
-            color: var(--color-dark-navy); /* Darker heading color */
+            color: var(--color-dark-navy);
             font-family: var(--font-primary);
-            margin-bottom: var(--spacing-md); /* Use spacing variable */
+            margin-bottom: var(--spacing-md);
             text-shadow: 0 0 15px var(--heading-shadow-color);
             font-size: clamp(1.4rem, 5vw, 2.2rem);
         }
 
         h3 {
-            color: var(--color-dark-navy); /* Darker heading color */
+            color: var(--color-dark-navy);
             font-family: var(--font-primary);
-            margin: var(--spacing-md) 0 var(--spacing-sm) 0; /* Use spacing variables */
+            margin: var(--spacing-md) 0 var(--spacing-sm) 0;
             text-shadow: 0 0 10px var(--heading-shadow-color);
             font-size: clamp(1rem, 4vw, 1.2rem);
         }
 
-        /* --- Global Glassmorphism Container Style --- */
         .glass-container {
             position: relative;
-            background: var(--glass-background); /* White glass background */
-            border: 2px solid var(--glass-border); /* White glass border */
+            background: var(--glass-background);
+            border: 2px solid var(--glass-border);
             border-radius: var(--border-radius);
-            padding: var(--container-padding); /* Use container padding variable */
+            padding: var(--container-padding);
             box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.15), /* Softer shadow */
+                0 15px 35px rgba(0, 0, 0, 0.15),
                 0 5px 15px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8); /* Stronger inner highlight */
-            backdrop-filter: blur(var(--glass-blur)); /* Apply blur */
-            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
-            overflow: hidden; /* For gradient border effect and shine */
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth transitions */
-            margin: 0 auto; /* Center individual containers */
-            width: clamp(280px, 90vw, 400px); /* Responsive width applied globally here */
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto;
+            width: clamp(280px, 90vw, 400px);
         }
 
         .glass-container::before {
@@ -98,13 +96,12 @@
                 transparent, 
                 var(--color-cyan)
             );
-            border-radius: var(--border-radius); /* Match container border-radius */
+            border-radius: var(--border-radius);
             z-index: -1;
-            opacity: 0.8; /* Always visible */
+            opacity: 0.8;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        /* Shine animation on hover */
         .glass-container::after {
             content: '';
             position: absolute;
@@ -112,53 +109,48 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3); /* White shine color */
+            background: rgba(255, 255, 255, 0.3);
             transform: skewX(-30deg);
             transition: all 0.5s ease;
-            pointer-events: none; /* Allows clicks through the shine */
+            pointer-events: none;
         }
 
         .glass-container:hover {
-            transform: translateY(-3px) scale(1.02); /* Slight scale on hover */
+            transform: translateY(-3px) scale(1.02);
             box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.25), /* Stronger shadow on hover */
+                0 20px 40px rgba(0, 0, 0, 0.25),
                 0 8px 20px rgba(0, 220, 253, 0.08),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .glass-container:hover::after {
-            left: 100%; /* Move shine across */
+            left: 100%;
         }
-        /* --- End Global Glassmorphism Container Style --- */
 
         #reader { 
-            /* Inherits most styles from .glass-container */
-            width: clamp(250px, 80vw, 350px); /* Responsive width for reader */
-            /* Force 1:1 aspect ratio */
+            width: clamp(250px, 80vw, 350px);
             aspect-ratio: 1 / 1; 
-            margin-bottom: var(--spacing-md); /* Specific margin for reader */
-            overflow: hidden; /* Important for camera feed */
-            box-shadow: /* Retain specific box-shadow for camera as it's animated */
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+            box-shadow:
                 0 0 30px rgba(0, 0, 0, 0.1),
                 0 15px 35px rgba(0, 0, 0, 0.2);
             animation: glow 3s ease-in-out infinite;
             position: relative;
-            background-color: var(--color-black); /* Ensure a solid background for video */
-            display: flex; /* Make it a flex container for centering video */
+            background-color: var(--color-black);
+            display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Make video and canvas inside reader responsive */
         #reader video,
         #reader canvas {
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover; /* Cover the container, cropping as needed */
+            object-fit: cover;
             border-radius: calc(var(--border-radius) - 4px);
         }
 
-        /* Fix QR scanner overlay positioning - make it inside the camera view */
         #reader__scan_region {
             position: relative !important;
             width: 100% !important;
@@ -167,12 +159,10 @@
             overflow: hidden;
         }
 
-        /* Style the QR box overlay to be inside the camera view */
         #reader__scan_region img[alt="Info icon"] {
-            display: none !important; /* Hide the info icon */
+            display: none !important;
         }
 
-        /* Position the QR scanning box properly inside the camera view */
         #reader__scan_region video {
             width: 100% !important;
             height: 100% !important;
@@ -180,12 +170,10 @@
             border-radius: calc(var(--border-radius) - 4px);
         }
 
-        /* Fix the dashboard/controls positioning */
         #reader__dashboard_section {
-            display: none !important; /* Hide the default dashboard as we have our own controls */
+            display: none !important;
         }
 
-        /* Style the scanning region border */
         #reader__scan_region {
             border: 3px solid var(--color-cyan) !important;
             box-shadow: 
@@ -193,7 +181,6 @@
                 inset 0 0 20px rgba(0, 220, 253, 0.1) !important;
         }
 
-        /* Fix the QR code scanning area overlay */
         #reader div[style*="position: absolute"] {
             border: 2px solid var(--color-cyan) !important;
             border-radius: 8px !important;
@@ -203,21 +190,21 @@
         }
 
         #zoomSlider {
-            width: clamp(180px, 60vw, 250px); /* Responsive width for slider */
-            margin-bottom: var(--spacing-md); /* Margin after slider */
+            width: clamp(180px, 60vw, 250px);
+            margin-bottom: var(--spacing-md);
             display: block;
             appearance: none;
-            height: clamp(6px, 1.5vw, 8px); /* Thicker slider */
-            background: rgba(0, 0, 0, 0.15); /* Darker track */
+            height: clamp(6px, 1.5vw, 8px);
+            background: rgba(0, 0, 0, 0.15);
             border-radius: 4px;
             outline: none;
         }
 
         #zoomSlider::-webkit-slider-thumb {
             appearance: none;
-            width: clamp(20px, 4vw, 24px); /* Larger thumb */
+            width: clamp(20px, 4vw, 24px);
             height: clamp(20px, 4vw, 24px);
-            background: var(--color-deep-blue); /* Dark thumb */
+            background: var(--color-deep-blue);
             border: 2px solid var(--color-cyan);
             border-radius: 50%;
             cursor: pointer;
@@ -243,57 +230,54 @@
         }
 
         #scannedText {
-            margin-bottom: var(--spacing-md); /* Consistent margin */
-            /* Inherits glass-container styles */
-            word-wrap: break-word; /* Ensure text wraps */
-            color: var(--input-text-color); /* Apply text color */
-            min-height: clamp(60px, 12vw, 80px); /* Ensure minimum height */
+            margin-bottom: var(--spacing-md);
+            word-wrap: break-word;
+            color: var(--input-text-color);
+            min-height: clamp(60px, 12vw, 80px);
             font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
-        /* Specific styling for the control section (label, select, button) */
-        .control-section { /* Changed from .control-navbar to .control-section for better semantic clarity */
-            display: flex; /* Ensure flexbox for internal layout */
+        .control-section {
+            display: flex;
             flex-direction: column;
-            gap: var(--spacing-sm); /* Smaller gap for internal elements */
-            margin-bottom: var(--spacing-md); /* Consistent margin */
-            /* Inherits glass-container styles */
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
         }
 
         select, button { 
             padding: clamp(8px, 2.5vw, 12px) clamp(15px, 4vw, 20px); 
-            margin: 0; /* Remove default margins to use gap */
+            margin: 0;
             border-radius: clamp(12px, 3vw, 18px);
-            border: 2px solid var(--color-deep-blue); /* Darker border */
+            border: 2px solid var(--color-deep-blue);
             font-family: var(--font-secondary);
             font-weight: 700;
             font-size: clamp(0.7rem, 2.2vw, 0.85rem);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            background: var(--button-background); /* Darker button background */
-            color: var(--button-text-color); /* White text */
+            background: var(--button-background);
+            color: var(--button-text-color);
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 100%; /* Make buttons and select fill container width */
-            min-height: clamp(40px, 8vw, 48px); /* Touch-friendly minimum height */
+            width: 100%;
+            min-height: clamp(40px, 8vw, 48px);
         }
 
         select:hover, button:hover:not(:disabled) {
-            background: var(--button-hover-background); /* Even darker on hover */
+            background: var(--button-hover-background);
             color: var(--color-white);
             transform: translateY(-2px) scale(1.05);
-            border-color: var(--color-cyan); /* Cyan border on hover */
+            border-color: var(--color-cyan);
             box-shadow: 
-                0 8px 25px rgba(0, 220, 253, 0.2), /* Cyan glow on hover */
+                0 8px 25px rgba(0, 220, 253, 0.2),
                 0 0 20px rgba(0, 220, 253, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         button:disabled {
-            background: rgba(12, 17, 29, 0.3); /* Darker disabled background */
+            background: rgba(12, 17, 29, 0.3);
             color: rgba(255, 255, 255, 0.6);
             cursor: not-allowed;
             transform: none;
@@ -323,46 +307,39 @@
         #status { 
             font-weight: bold; 
             color: var(--color-dark-navy);
-            /* Inherits glass-container styles */
-            margin: var(--spacing-md) auto; /* Apply consistent margin and center */
-            word-wrap: break-word; /* Ensure text wraps */
+            margin: var(--spacing-md) auto;
+            word-wrap: break-word;
             min-height: clamp(50px, 10vw, 70px);
             font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
-        /* Specific styles for textarea within a glass-container */
         textarea.glass-container {
-            /* Override default textarea styles */
-            appearance: none; /* Remove default browser styling */
+            appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-            
-            /* Apply glass container styles directly */
-            background: var(--glass-background); /* Explicitly set for textarea */
-            border: 2px solid var(--glass-border); /* Explicitly set for textarea */
-            border-radius: var(--border-radius); /* Explicitly set for textarea */
+            background: var(--glass-background);
+            border: 2px solid var(--glass-border);
+            border-radius: var(--border-radius);
             box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.15), /* Explicitly set for textarea */
+                0 15px 35px rgba(0, 0, 0, 0.15),
                 0 5px 15px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(var(--glass-blur)); /* Explicitly set for textarea */
-            -webkit-backdrop-filter: blur(var(--glass-blur)); /* For Safari */
-            
-            margin-top: var(--spacing-sm); /* Adjust top margin for manual input */
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            margin-top: var(--spacing-sm);
             font-family: var(--font-secondary);
-            resize: vertical; /* Allow vertical resizing */
-            color: var(--input-text-color); /* Apply text color */
-            min-height: clamp(80px, 20vw, 100px); /* Ensure a minimum height for usability */
-            width: clamp(280px, 90vw, 400px); /* Ensure it's responsive like other containers */
-            padding: var(--container-padding); /* Apply container padding */
+            resize: vertical;
+            color: var(--input-text-color);
+            min-height: clamp(80px, 20vw, 100px);
+            width: clamp(280px, 90vw, 400px);
+            padding: var(--container-padding);
             font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
 
         textarea.glass-container::placeholder {
-            color: rgba(12, 17, 29, 0.5); /* Slightly lighter placeholder */
+            color: rgba(12, 17, 29, 0.5);
         }
 
-        /* Ensure the :before and :after pseudo-elements also apply to textarea */
         textarea.glass-container::before {
             content: '';
             position: absolute;
@@ -375,8 +352,8 @@
                 transparent, 
                 var(--color-cyan)
             );
-            border-radius: var(--border-radius); /* Match textarea border-radius */
-            z-index: -1; /* Behind the main element */
+            border-radius: var(--border-radius);
+            z-index: -1;
             opacity: 0.8;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
@@ -388,10 +365,10 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3); /* White shine color */
+            background: rgba(255, 255, 255, 0.3);
             transform: skewX(-30deg);
             transition: all 0.5s ease;
-            pointer-events: none; /* Allows clicks through */
+            pointer-events: none;
         }
 
         textarea.glass-container:hover {
@@ -408,23 +385,23 @@
 
         #popup {
             display: none; 
-            background: var(--glass-background); /* White glass background */
-            border: 2px solid var(--glass-border); /* White glass border */
+            background: var(--glass-background);
+            border: 2px solid var(--glass-border);
             border-radius: var(--border-radius);
-            padding: var(--container-padding); /* Use container padding for popup */
+            padding: var(--container-padding);
             position: fixed; 
             top: 50%; 
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.9); /* Initial scale for animation */
-            opacity: 0; /* Initial opacity for animation */
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0;
             z-index: 9999; 
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.25), /* Stronger shadow */
+                0 25px 50px rgba(0, 0, 0, 0.25),
                 0 0 30px rgba(0, 220, 253, 0.1);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bounce effect */
-            width: clamp(280px, 90vw, 450px); /* Responsive popup width */
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            width: clamp(280px, 90vw, 450px);
             max-height: 80vh;
             overflow-y: auto;
         }
@@ -437,7 +414,7 @@
 
         #popup h3 {
             color: var(--color-dark-navy);
-            margin-bottom: var(--spacing-sm); /* Adjusted margin */
+            margin-bottom: var(--spacing-sm);
             text-shadow: none;
             font-size: clamp(1rem, 3vw, 1.2rem);
         }
@@ -446,8 +423,8 @@
             background: var(--button-background);
             color: var(--button-text-color);
             border-color: var(--button-background);
-            width: auto; /* Buttons inside popup don't need full width */
-            margin-top: var(--spacing-md); /* Margin above OK button */
+            width: auto;
+            margin-top: var(--spacing-md);
             min-width: clamp(80px, 20vw, 120px);
         }
 
@@ -465,9 +442,9 @@
             left: 0;
             width: 100%; 
             height: 100%; 
-            background: rgba(0, 0, 0, 0.6); /* Darker overlay for white theme */
+            background: rgba(0, 0, 0, 0.6);
             z-index: 9998;
-            backdrop-filter: blur(8px); /* Stronger blur */
+            backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             transition: opacity 0.4s ease;
             opacity: 0;
@@ -484,7 +461,7 @@
             left: 0;
             width: 100%; 
             height: 100%;
-            background: rgba(0, 0, 0, 0.9); /* Darker loading overlay */
+            background: rgba(0, 0, 0, 0.9);
             z-index: 9999;
             color: var(--color-white); 
             font-size: clamp(16px, 4vw, 20px);
@@ -500,28 +477,26 @@
         hr {
             border: none;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent); /* Darker HR gradient */
-            margin: var(--spacing-lg) 0; /* Use spacing variable for more prominent separator */
+            background: linear-gradient(90deg, transparent, var(--color-medium-blue), transparent);
+            margin: var(--spacing-lg) 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: clamp(280px, 90vw, 400px);
         }
 
         label {
-            color: var(--color-dark-navy); /* Darker label color */
+            color: var(--color-dark-navy);
             font-weight: 700;
             font-family: var(--font-secondary);
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             font-size: clamp(0.8rem, 2.2vw, 1rem);
         }
 
-        /* Subtle Animations */
         @keyframes glow {
             0%, 100% { box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); }
             50% { box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); }
         }
 
-        /* Touch device optimizations */
         @media (hover: none) and (pointer: coarse) {
             .glass-container:hover {
                 transform: none;
@@ -536,7 +511,6 @@
             }
         }
 
-        /* Landscape orientation on mobile */
         @media (orientation: landscape) and (max-height: 500px) {
             body {
                 gap: var(--spacing-sm);
@@ -548,13 +522,11 @@
             }
             
             #reader {
-                /* When in landscape and max-height 500px, make it less tall to fit */
                 height: clamp(120px, 25vh, 180px);
-                width: auto; /* Allow width to adjust based on height for 1:1 */
+                width: auto;
             }
         }
 
-        /* Extra small screens */
         @media (max-width: 320px) {
             body {
                 padding: 8px;
@@ -572,7 +544,6 @@
             
             #reader {
                 width: calc(100vw - 20px);
-                /* Height will be set by aspect-ratio */
             }
             
             #zoomSlider {
@@ -580,15 +551,14 @@
             }
         }
 
-        /* Large screens optimization */
         @media (min-width: 1200px) {
             .glass-container, textarea.glass-container {
                 width: 450px;
             }
             
             #reader {
-                width: 380px; /* Adjust as needed for larger screens while maintaining 1:1 */
-                height: 380px; /* Height explicitly set to match width for consistency on large screens */
+                width: 380px;
+                height: 380px;
             }
             
             #zoomSlider {
@@ -596,7 +566,6 @@
             }
         }
 
-        /* Scanner guide overlay */
     #reader .scanner-overlay {
     position: absolute;
     top: 50%;
@@ -612,8 +581,378 @@
     backdrop-filter: blur(2px);
     }
 
-    /* Ensure camera container positions child elements correctly */
     #reader {
     position: relative;
     overflow: hidden;
     }
+
+
+ .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--glass-background);
+    border-top: 2px solid var(--glass-border);
+    border-radius: 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: 
+        0 -5px 15px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    z-index: 1000;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+@keyframes glowing-border {
+    0% { border-color: var(--glass-border); }
+    50% { border-color: color-mix(in srgb, var(--color-cyan) 30%, var(--glass-border)); }
+    100% { border-color: var(--glass-border); }
+}
+
+.footer:focus-within {
+    animation: glowing-border 2s infinite alternate;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, 
+        var(--color-cyan), 
+        transparent 50%,
+        var(--color-cyan)
+    );
+    border-radius: var(--border-radius);
+    z-index: -1;
+    opacity: 0.6;
+    filter: blur(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+    animation: pulse-glow 3s infinite alternate;
+}
+
+@keyframes pulse-glow {
+    0% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.01); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0.6; }
+}
+
+.footer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0)
+    );
+    transform: skewX(-30deg);
+    transition: all 0.6s ease-in-out;
+    pointer-events: none;
+}
+
+.footer:hover::after {
+    left: 120%;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm); 
+}
+
+.brand-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    position: relative;
+}
+
+.logo-placeholder {
+    width: clamp(40px, 10vw, 48px);
+    height: clamp(40px, 10vw, 48px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--color-white);
+    font-size: clamp(16px, 4vw, 20px);
+    font-family: var(--font-primary);
+    transition: transform 0.3s ease, filter 0.3s ease;
+    overflow: hidden;
+}
+
+.logo-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: inherit;
+    transition: transform 0.3s ease;
+}
+
+.logo-placeholder:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px var(--color-cyan));
+}
+
+.logo-placeholder:hover img {
+    transform: rotate(5deg);
+}
+
+.brand-divider {
+    color: var(--color-medium-blue);
+    font-size: 2.5rem;
+    font-weight: 200;
+    margin: 0 var(--spacing-md);
+    font-family: var(--font-primary);
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.footer-container:hover .brand-divider {
+    transform: scale(1.2);
+    color: var(--color-cyan);
+}
+
+.brand-name {
+    font-size: clamp(11px, 4vw, 14px);
+    color: var(--color-black);
+    font-weight: 100;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-family: var(--font-secondary);
+    transition: all 0.3s ease;
+}
+
+.brand-name:hover {
+    color: var(--color-dark-navy);
+    text-shadow: 0 0 25px rgba(0, 220, 253, 0.7);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .brand-name {
+        font-size: clamp(12px, 3.5vw, 16px);
+    }
+
+    .brand-header {
+        gap: var(--spacing-sm);
+    }
+
+    .logo-placeholder {
+        width: clamp(36px, 8vw, 40px);
+        height: clamp(36px, 8vw, 40px);
+        font-size: clamp(14px, 3.5vw, 18px);
+    }
+
+    .brand-divider {
+        font-size: 2rem;
+        margin: 0 var(--spacing-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .footer {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .brand-name {
+        font-size: clamp(10px, 3vw, 14px);
+        letter-spacing: 1px;
+    }
+
+    .brand-header {
+        gap: var(--spacing-xs);
+    }
+
+    .logo-placeholder {
+        width: clamp(32px, 7vw, 36px);
+        height: clamp(32px, 7vw, 36px);
+        font-size: clamp(12px, 3vw, 16px);
+    }
+
+    .brand-divider {
+        font-size: 1.5rem;
+        margin: 0 var(--spacing-xs);
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .footer:hover::after {
+        display: none;
+    }
+    
+    .logo-placeholder:hover,
+    .brand-name:hover {
+        transform: none;
+        color: inherit;
+        text-shadow: none;
+        filter: none;
+    }
+
+    .footer-container:hover .brand-divider {
+        transform: none;
+        color: inherit;
+    }
+}
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--color-cyan), 
+                transparent, 
+                var(--color-cyan)
+            );
+            border-radius: var(--border-radius);
+            z-index: -1;
+            opacity: 0.8;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .footer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-30deg);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .footer:hover::after {
+            left: 100%;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .logo-placeholder {
+            width: clamp(40px, 10vw, 48px);
+            height: clamp(40px, 10vw, 48px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--color-white);
+            font-size: clamp(16px, 4vw, 20px);
+            font-family: var(--font-primary);
+          
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: inherit;
+        }
+
+        .logo-placeholder:hover {
+            transform: scale(1.05);
+        }
+
+        .brand-divider {
+            color: var(--color-medium-blue);
+            font-size: clamp(10px, 5vw, 5px);
+            margin: 0 var(--spacing-xs);
+            font-family: var(--font-primary);
+        }
+
+        .brand-amplify {
+            font-size: clamp(11px, 4vw, 14px);
+            color: var(--color-black);
+            font-weight: 100;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: var(--font-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .brand-amplify:hover {
+            color: var(--color-dark-navy);
+            text-shadow: 0 0 20px rgba(0, 220, 253, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .footer {
+                margin: var(--spacing-md);
+                padding: var(--spacing-md);
+            }
+            
+            .brand-amplify {
+                font-size: clamp(12px, 3.5vw, 16px);
+            }
+
+            .brand-header {
+                gap: var(--spacing-sm);
+            }
+
+            .logo-placeholder {
+                width: clamp(36px, 8vw, 40px);
+                height: clamp(36px, 8vw, 40px);
+                font-size: clamp(14px, 3.5vw, 18px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer {
+                margin: var(--spacing-sm);
+                padding: var(--spacing-sm);
+            }
+
+            .brand-amplify {
+                font-size: clamp(10px, 3vw, 14px);
+            }
+
+            .brand-header {
+                gap: var(--spacing-xs);
+            }
+
+            .logo-placeholder {
+                width: clamp(32px, 7vw, 36px);
+                height: clamp(32px, 7vw, 36px);
+                font-size: clamp(12px, 3vw, 16px);
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .footer:hover::after {
+                display: none;
+            }
+            
+            .logo-placeholder:hover,
+            .brand-amplify:hover {
+                transform: none;
+                color: inherit;
+            }
+        }
