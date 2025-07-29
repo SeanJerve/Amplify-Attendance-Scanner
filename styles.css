@@ -7,8 +7,8 @@
             --color-cyan: #00DCFD;
             --color-black: #000000;
             
-            --font-primary: 'Arial Black', Arial, sans-serif;
-            --font-secondary: 'Arial', sans-serif;
+--font-primary: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+--font-secondary: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
             
             --border-radius: 20px;
             --glass-blur: 25px; 
@@ -956,3 +956,124 @@
                 color: inherit;
             }
         }
+.project-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+  justify-content: center;
+  padding: var(--spacing-lg) var(--container-padding);
+  width: clamp(320px, 95vw, 700px);
+}
+
+.project-title {
+  color: var(--color-dark-navy);
+  font-family: var(--font-primary);
+  margin: 0;
+  text-shadow: 0 2px 4px var(--heading-shadow-color);
+  font-size: clamp(1.4rem, 4.5vw, 2.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: clamp(1px, 0.3vw, 2px);
+  position: relative;
+  white-space: nowrap;
+}
+
+.project-title .ceng-highlight {
+  background: linear-gradient(90deg, 
+    #000000 0%, 
+    #c0c0c0 20%,
+    #ffffff 35%,
+    #000000 50%,
+    #c0c0c0 65%,
+    #ffffff 80%,
+    #000000 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  display: inline-block;
+  font-weight: 900;
+  margin: 0 4px;
+  animation: text-shine 10s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(192, 192, 192, 0.6))
+          drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+}
+
+.project-title .ceng-highlight::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -4px;
+  right: -4px;
+  bottom: -2px;
+  background: linear-gradient(135deg, 
+    rgba(0, 220, 253, 0.2), 
+    transparent 30%, 
+    rgba(255, 255, 255, 0.1) 70%, 
+    rgba(0, 220, 253, 0.2)
+  );
+  border-radius: 8px;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+.project-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.project-logo img {
+  width: clamp(5rem, 8vw, 7rem);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) 
+          drop-shadow(0 2px 6px rgba(0, 220, 253, 0.2));
+  transition: filter 0.3s ease;
+}
+
+.project-logo:hover {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.project-logo:hover img {
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4)) 
+          drop-shadow(0 0 12px rgba(0, 220, 253, 0.4));
+}
+
+@keyframes text-shine {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@media (max-width: 480px) {
+  .project-header {
+    width: clamp(280px, 95vw, 400px);
+    gap: var(--spacing-md);
+  }
+  
+  .project-title {
+    font-size: clamp(1.1rem, 3.8vw, 1.9rem);
+    letter-spacing: clamp(0.5px, 0.2vw, 1.5px);
+  }
+  
+  .project-logo img {
+    width: clamp(4rem, 7vw, 5.5rem);
+  }
+}
+
+@media (max-width: 320px) {
+  .project-title {
+    font-size: clamp(1rem, 3.5vw, 1.6rem);
+  }
+  
+  .project-logo img {
+    width: clamp(3.5rem, 6vw, 5rem);
+  }
+}
