@@ -63,6 +63,22 @@ body {
 
 
 
+#fixed-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('ceng.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+  z-index: -100;
+  pointer-events: none;
+  opacity: 0.3; /* Adjust if too strong */
+}
+
+
 
             h2 {
                 color: var(--color-dark-navy);
