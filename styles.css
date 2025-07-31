@@ -36,46 +36,30 @@
                 box-sizing: border-box;
             }
 
-    body {
-    position: relative;
-    font-family: var(--font-secondary);
-    text-align: center;
-    padding: var(--spacing-md);
-    color: var(--text-color);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--spacing-md);
-    overflow-x: hidden;
-    z-index: 1;
-    background: transparent;
-}
 
-body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: -2;
-    background-image: 
-        linear-gradient(135deg, rgba(255, 255, 255, 0.65), rgba(227, 227, 227, 0.65)),
-        url('ceng.svg');
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    will-change: transform;
-    pointer-events: none;
-}
+        body {
+        position: relative;
+        font-family: var(--font-secondary);
+        text-align: center;
+        padding: var(--spacing-md);
+        color: var(--text-color);
+        background: url('ceng.svg');
+        background-color: var(--color-light-gray);
+        min-height: 100vh;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;  
+        background-attachment: fixed;  
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: var(--spacing-md);
+        overflow-x: hidden;
+        z-index: -1;
+    }
 
-body::after {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: -1;
-    background: rgba(255, 255, 255, 0.6); /* Light veil */
-    pointer-events: none;
-}
+
 
 
 
