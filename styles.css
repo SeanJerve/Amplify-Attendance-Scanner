@@ -36,36 +36,37 @@
                 box-sizing: border-box;
             }
 
-           body { 
-        font-family: var(--font-secondary); 
-        text-align: center; 
-        padding: var(--spacing-md); 
-        
-        background: 
-            linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(227, 227, 227, 0.85)),
-            url('ceng.svg');
-        background-size: 
-            cover,
-            clamp(10vw, 100vh, 140%);
-        background-position: 
-            center,
-            center;
-        background-repeat: 
-            no-repeat,
-            no-repeat;
-        background-attachment: fixed;
-        filter: 
-            drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))
-            drop-shadow(-1px -1px 2px rgba(255, 255, 255, 0.8));
-        
-        color: var(--text-color);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        gap: var(--spacing-md);
-    }
+           body {
+    position: relative;
+    font-family: var(--font-secondary);
+    text-align: center;
+    padding: var(--spacing-md);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--spacing-md);
+    overflow-x: hidden;
+    z-index: 1;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+    background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(227, 227, 227, 0.85)),
+        url('ceng.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 65vh;
+    background-attachment: scroll;
+    will-change: transform;
+}
+
             h2 {
                 color: var(--color-dark-navy);
                 font-family: var(--font-primary);
