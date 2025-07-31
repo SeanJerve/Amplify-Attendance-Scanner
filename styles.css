@@ -55,40 +55,11 @@ body {
     z-index: 0;
     /* Remove problematic properties for iOS */
 }
-
-/* Create background using pseudo-element for better iOS performance */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('ceng.png');
-    background-size: 40vh;
-    background-blend-mode: exclusion;
-    background-repeat: no-repeat;
-    background-position: center;
-    z-index: -1;
-    /* Enable hardware acceleration for smoother performance */
-    transform: translate3d(0, 0, 0);
-    will-change: transform;
-    pointer-events: none; /* Prevent interference with touch events */
-}
-
-/* iOS-specific optimizations */
 @supports (-webkit-overflow-scrolling: touch) {
-    /* For iOS devices, use absolute positioning instead of fixed */
     body::before {
-        position: absolute;
-        /* Remove transform and will-change for iOS to prevent issues */
-        transform: none;
-        will-change: auto;
-        /* Use scroll instead of fixed attachment */
-        background-attachment: scroll;
+        display: none !important; /* Prevent double background */
     }
-    
-    /* Alternative approach: Create a separate background container for iOS */
+
     body::after {
         content: '';
         position: absolute;
@@ -101,10 +72,12 @@ body::before {
         background-blend-mode: exclusion;
         background-repeat: no-repeat;
         background-position: center center;
-        z-index: -2;
-        opacity: 0.8; /* Slightly reduce opacity for better performance */
+        z-index: -1;
+        opacity: 0.8;
+        pointer-events: none;
     }
 }
+
 
 /* Mobile Safari specific fixes */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
