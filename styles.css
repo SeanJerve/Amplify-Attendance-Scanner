@@ -43,7 +43,10 @@ body {
   text-align: center;
   padding: var(--spacing-md);
   color: var(--text-color);
-  background-color: var(--color-light-gray);
+  background-image: url(ceng.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
