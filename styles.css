@@ -36,14 +36,6 @@
                 box-sizing: border-box;
             }
 
-
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  overflow-x: hidden;
-}
-
 body {
   position: relative;
   font-family: var(--font-secondary);
@@ -56,29 +48,19 @@ body {
   align-items: center;
   justify-content: flex-start;
   gap: var(--spacing-md);
-  z-index: 0;
+  overflow-x: hidden;
+  /* Remove z-index: 0 here if it's causing issues with content being behind */
 }
 
-/* Fixed background that doesn't scroll */
-body::before {
-    opacity: 0.25;
-filter: blur(0.5px);
-
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+/* Universal fixed background on the body itself */
+body {
   background-image: url('ceng.png');
   background-repeat: no-repeat;
   background-size: contain;
-  background-position: center center;
-  background-attachment: fixed; /* ensure extra lock */
-  z-index: -10;
-  pointer-events: none;
-  will-change: transform;
+  background-position: center;
+  background-attachment: fixed; /* This is the key property! */
 }
+
 
 
 
