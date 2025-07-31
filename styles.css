@@ -902,28 +902,6 @@ body::before {
     text-shadow: 0 0 20px rgba(0, 220, 253, 0.5);
 }
 
-@supports (-webkit-overflow-scrolling: touch) {
-    @media screen and (max-width: 768px) {
-        body {
-            background-attachment: scroll;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 80vw;
-            height: 80vh;
-            background-image: url('ceng.svg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center center;
-            z-index: -2;
-        }
-    }
-}
-
-
 @media (max-width: 768px) {
     .footer {
         padding: var(--spacing-sm) var(--spacing-md);
