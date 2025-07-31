@@ -36,7 +36,7 @@
                 box-sizing: border-box;
             }
 
-           body {
+    body {
     position: relative;
     font-family: var(--font-secondary);
     text-align: center;
@@ -50,6 +50,7 @@
     gap: var(--spacing-md);
     overflow-x: hidden;
     z-index: 1;
+    background: transparent;
 }
 
 body::before {
@@ -57,15 +58,16 @@ body::before {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     z-index: -1;
-    background: 
-        linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(227, 227, 227, 0.85)),
+    background-image: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.65), rgba(227, 227, 227, 0.65)),
         url('ceng.svg');
-    background-position: center;
+    background-position: center center;
     background-repeat: no-repeat;
-    background-size: 65vh;
-    background-attachment: scroll;
+    background-size: cover;
     will-change: transform;
+    pointer-events: none;
 }
+
 
             h2 {
                 color: var(--color-dark-navy);
