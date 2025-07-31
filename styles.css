@@ -44,11 +44,6 @@ body {
   text-align: center;
   padding: var(--spacing-md);
   color: var(--text-color);
-  background-image: url(ceng.png);
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  background-attachment: fixed;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -57,6 +52,32 @@ body {
   gap: var(--spacing-md);
   overflow-x: hidden;
   z-index: 0;
+}
+
+/* Universal fixed background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('ceng.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* iOS override (some iOS versions ignore fixed) */
+@supports (-webkit-overflow-scrolling: touch) {
+  body::before {
+    position: absolute;
+    background-attachment: scroll;
+    opacity: 0.9;
+  }
 }
 
 
