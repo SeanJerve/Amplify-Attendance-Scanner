@@ -43,10 +43,11 @@
         text-align: center;
         padding: var(--spacing-md);
         color: var(--text-color);
-        background: url('ceng.svg');
+        background: url('ceng.png');
         background-color: var(--color-light-gray);
         min-height: 100vh;
-        background-size: contain;
+        background-size: 40vh;
+        background-blend-mode:exclusion;
         background-repeat: no-repeat;
         background-position: center;  
         background-attachment: fixed;  
@@ -56,11 +57,8 @@
         justify-content: flex-start;
         gap: var(--spacing-md);
         overflow-x: hidden;
-        z-index: -1;
+        z-index: 0;
     }
-
-
-
 
 
             h2 {
