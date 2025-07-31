@@ -37,6 +37,12 @@
             }
 
 
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+}
 
 body {
   position: relative;
@@ -50,12 +56,14 @@ body {
   align-items: center;
   justify-content: flex-start;
   gap: var(--spacing-md);
-  overflow-x: hidden;
   z-index: 0;
 }
 
-/* Universal fixed background */
+/* Fixed background that doesn't scroll */
 body::before {
+    opacity: 0.25;
+filter: blur(0.5px);
+
   content: '';
   position: fixed;
   top: 0;
@@ -65,20 +73,13 @@ body::before {
   background-image: url('ceng.png');
   background-repeat: no-repeat;
   background-size: contain;
-  background-position: center;
-  z-index: -1;
+  background-position: center center;
+  background-attachment: fixed; /* ensure extra lock */
+  z-index: -10;
   pointer-events: none;
   will-change: transform;
 }
 
-/* iOS override (some iOS versions ignore fixed) */
-@supports (-webkit-overflow-scrolling: touch) {
-  body::before {
-    position: absolute;
-    background-attachment: scroll;
-    opacity: 0.9;
-  }
-}
 
 
             h2 {
