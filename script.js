@@ -49,7 +49,7 @@ function submitAttendance() {
         return;
     }
 
-    statusEl.innerText = "⏳ Sending...";
+    statusEl.innerText = "Sending...";
     submitBtn.disabled = true;
     document.getElementById("loading").style.display = "flex";
 
@@ -78,7 +78,7 @@ function submitAttendance() {
 function onScanSuccess(decodedText) {
     lastScanned = decodedText;
     document.getElementById("scannedText").innerText = decodedText;
-    document.getElementById("status").innerText = "✅ QR scanned. Select year level.";
+    document.getElementById("status").innerText = "QR SCANNED. Select year level.";
     checkInputs();
     showPopup(decodedText);
 }
