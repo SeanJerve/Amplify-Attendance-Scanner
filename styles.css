@@ -36,7 +36,6 @@
                 box-sizing: border-box;
             }
 
-
 body {
   position: relative;
   font-family: var(--font-secondary);
@@ -50,8 +49,35 @@ body {
   justify-content: flex-start;
   gap: var(--spacing-md);
   overflow-x: hidden;
-  z-index: 0;
+  /* Remove z-index: 0 here if it's causing issues with content being behind */
 }
+
+/* Universal fixed background on the body itself */
+body {
+  background-image: url('ceng.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  background-attachment: fixed; /* This is the key property! */
+}
+
+
+
+#fixed-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('ceng.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+  z-index: -100;
+  pointer-events: none;
+  opacity: 0.3; /* Adjust if too strong */
+}
+
 
 
             h2 {
@@ -417,7 +443,7 @@ body {
             }
 
             #popup h3 {
-                color: var(--color-white);
+                color: var(--color-dark-navy);
                 margin-bottom: var(--spacing-sm);
                 text-shadow: none;
                 font-size: clamp(1rem, 3vw, 1.2rem);
@@ -489,7 +515,7 @@ body {
             }
 
             label {
-                color: var(--color-white);
+                color: var(--color-dark-navy);
                 font-weight: 700;
                 font-family: var(--font-secondary);
                 text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
