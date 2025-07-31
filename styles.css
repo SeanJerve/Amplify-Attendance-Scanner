@@ -37,7 +37,7 @@
             }
 
 
-   body::before {
+   body {
       position: relative;
     font-family: var(--font-secondary);
     text-align: center;
