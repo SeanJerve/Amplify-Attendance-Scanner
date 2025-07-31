@@ -37,21 +37,21 @@
             }
 
 
-   body {
-      position: relative;
-    font-family: var(--font-secondary);
-    text-align: center;
-    padding: var(--spacing-md);
-    color: var(--text-color);
-    background-color: var(--color-light-gray);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-md);
-    overflow-x: hidden;
-    z-index: 0;
+body {
+  position: relative;
+  font-family: var(--font-secondary);
+  text-align: center;
+  padding: var(--spacing-md);
+  color: var(--text-color);
+  background-color: var(--color-light-gray);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* This is key */
+  gap: var(--spacing-md);
+  overflow-x: hidden;
+  z-index: 0;
 }
 
 
