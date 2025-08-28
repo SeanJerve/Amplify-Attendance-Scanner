@@ -1,5 +1,5 @@
 
-const endpoint = "https://script.google.com/macros/s/AKfycbyZ9TjJ9kd95-YWQpZ6Eq5nWRZF0LcL2IOtqZnPtrWWogqieUh73G0hrhqIdX_FD44rRw/exec";
+const endpoint = "https://script.google.com/macros/s/AKfycbymstxQ0ebX92AWLfI7vSldptYEU1LQGjrCHkLTiYaYjOf5D_O9Lni8xqHS-d20RS4hvA/exec";
 const scanner = new Html5Qrcode("reader");
 let videoTrack = null;
 let lastScanned = "";
@@ -38,16 +38,22 @@ function submitAttendance() {
         return;
     }
 
-    const payload = manualInput
-        ? `${manualInput}|YEARLEVEL=${yearLevel}`
-        : lastScanned
-            ? `${lastScanned}|YEARLEVEL=${yearLevel}`
-            : null;
+    if (!uploadedImageBase64) {
+        alert("Please upload an e-signature image.");
+        return;
+    }
 
-    if (!payload) {
+    const studentData = manualInput || lastScanned;
+    if (!studentData) {
         alert("No scanned or manual data found.");
         return;
     }
+
+    const payload = JSON.stringify({
+        studentData: studentData,
+        yearLevel: yearLevel,
+        signature: uploadedImageBase64
+    });
 
     statusEl.innerText = "Sending...";
     submitBtn.disabled = true;
@@ -55,7 +61,7 @@ function submitAttendance() {
 
     fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "text/plain" },
+        headers: { "Content-Type": "application/json" },
         body: payload
     }).then(res => res.text())
         .then(msg => {
@@ -63,6 +69,7 @@ function submitAttendance() {
             document.getElementById("scannedText").innerText = "No scan yet...";
             document.getElementById("manualInput").value = "";
             document.getElementById("yearLevel").value = "";
+            removeImage();
             lastScanned = "";
         }).catch((error) => { 
             console.error("Error sending data:", error); 
@@ -106,8 +113,18 @@ function closePopup() {
 
 function checkInputs() {
     const manualInput = document.getElementById("manualInput").value.trim();
-    const enable = manualInput || lastScanned;
+    const yearLevel = document.getElementById("yearLevel").value;
+    const hasImage = uploadedImageBase64 !== null;
+    const hasData = manualInput || lastScanned;
+    
+    const enable = hasData && yearLevel && hasImage;
     document.getElementById("submitBtn").disabled = !enable;
+    
+    if (hasData && yearLevel && !hasImage) {
+        document.getElementById("status").innerText = "Please upload an e-signature image.";
+    } else if (hasData && !yearLevel) {
+        document.getElementById("status").innerText = "Please select year level.";
+    }
 }
 
 Html5Qrcode.getCameras().then(devices => {
@@ -170,6 +187,39 @@ function enableZoomControl() {
             }
         }
     }, 1000); 
+}
+
+let uploadedImageBase64 = null;
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        alert('Image size must be less than 2MB');
+        event.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        uploadedImageBase64 = e.target.result;
+        
+        const preview = document.getElementById('previewImage');
+        const container = document.getElementById('imagePreview');
+        preview.src = uploadedImageBase64;
+        container.style.display = 'block';
+        
+        checkInputs();
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeImage() {
+    uploadedImageBase64 = null;
+    document.getElementById('signatureUpload').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    checkInputs();
 }
 
 document.getElementById("yearLevel").addEventListener("change", checkInputs);
