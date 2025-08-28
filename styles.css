@@ -1028,3 +1028,53 @@ body {
         width: clamp(3.5rem, 6vw, 5rem);
     }
 }
+
+
+#signatureUpload {
+    padding: var(--spacing-sm);
+    border: 2px dashed var(--color-medium-blue);
+    border-radius: var(--border-radius);
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--input-text-color);
+    font-family: var(--font-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: var(--spacing-sm);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#signatureUpload:hover {
+    border-color: var(--color-cyan);
+    background: rgba(0, 220, 253, 0.1);
+}
+
+.image-preview-container {
+    margin-top: var(--spacing-sm);
+    text-align: center;
+    position: relative;
+}
+
+#previewImage {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--glass-border);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.remove-image-btn {
+    margin-top: var(--spacing-sm);
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.3s ease;
+}
+
+.remove-image-btn:hover {
+    background: #c82333;
+}
