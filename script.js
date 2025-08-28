@@ -195,11 +195,12 @@ function handleImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-        alert('Image size must be less than 2MB');
-        event.target.value = '';
-        return;
-    }
+    if (file.size > 10 * 1024 * 1024) {
+    alert('Image size must be less than 10MB');
+    event.target.value = '';
+    return;
+}
+
 
     const reader = new FileReader();
     reader.onload = function(e) {
