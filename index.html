@@ -33,6 +33,16 @@
             <option value="3rd Year">3rd Year</option>
             <option value="4th Year">4th Year</option>
         </select>
+
+        <div class="control-section glass-container">
+    <label for="signatureUpload">Upload E-Signature:</label>
+    <input type="file" id="signatureUpload" accept="image/*" onchange="handleImageUpload(event)">
+    <div id="imagePreview" class="image-preview-container" style="display: none;">
+        <img id="previewImage" alt="Signature preview">
+        <button type="button" onclick="removeImage()" class="remove-image-btn">Remove</button>
+    </div>
+</div>
+        
         <button onclick="submitAttendance()" id="submitBtn" disabled>Confirm & Send</button>
     </div>
 
@@ -73,3 +83,4 @@
   </div>
 </footer>
 </html>
+
