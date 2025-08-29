@@ -1,8 +1,31 @@
-const endpoint = "https://script.google.com/macros/s/AKfycbxP_SFTLhNt6Mv7jyFChtROvTWRwVHSJ7_p98i-R478cjxC_7JMxeYr62ppLz8I3sRN0Q/exec";
+
+const endpoint = "https://script.google.com/macros/s/AKfycbxL0OIpNwrYHccFLdIFv2jglF_63JhIs6qzuf17IEnZaaRduQBe-VlS4xtrma5CvxgmIA/exec";
 const scanner = new Html5Qrcode("reader");
 let videoTrack = null;
 let lastScanned = "";
-let uploadedImageBase64 = null;
+
+function sendToScript(data) {
+    document.getElementById("loading").style.display = "flex";
+
+    fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: data
+    }).then(res => res.text())
+        .then(msg => {
+            document.getElementById("status").innerText = msg;
+            document.getElementById("submitBtn").disabled = true;
+            document.getElementById("scannedText").innerText = "No scan yet...";
+            document.getElementById("manualInput").value = "";
+            document.getElementById("yearLevel").value = ""; 
+            lastScanned = "";
+        }).catch((error) => { 
+            console.error("Error sending data:", error);
+            document.getElementById("status").innerText = "Failed to send: " + error.message; 
+        }).finally(() => {
+            document.getElementById("loading").style.display = "none";
+        });
+}
 
 function submitAttendance() {
     const yearLevel = document.getElementById("yearLevel").value;
@@ -14,22 +37,17 @@ function submitAttendance() {
         alert("Please select year level.");
         return;
     }
-    if (!uploadedImageBase64) {
-        alert("Please upload an e-signature image.");
-        return;
-    }
 
-    const studentData = manualInput || lastScanned;
-    if (!studentData) {
+    const payload = manualInput
+        ? `${manualInput}|YEARLEVEL=${yearLevel}`
+        : lastScanned
+            ? `${lastScanned}|YEARLEVEL=${yearLevel}`
+            : null;
+
+    if (!payload) {
         alert("No scanned or manual data found.");
         return;
     }
-
-    const payload = {
-        studentData,
-        yearLevel,
-        signature: uploadedImageBase64
-    };
 
     statusEl.innerText = "Sending...";
     submitBtn.disabled = true;
@@ -37,23 +55,22 @@ function submitAttendance() {
 
     fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        headers: { "Content-Type": "text/plain" },
+        body: payload
     }).then(res => res.text())
-      .then(msg => {
-          statusEl.innerText = msg;
-          document.getElementById("scannedText").innerText = "No scan yet...";
-          document.getElementById("manualInput").value = "";
-          document.getElementById("yearLevel").value = "";
-          removeImage();
-          lastScanned = "";
-      }).catch((error) => { 
-          console.error("Error sending data:", error); 
-          statusEl.innerText = "Failed to send: " + error.message;
-      }).finally(() => {
-          document.getElementById("loading").style.display = "none";
-          submitBtn.disabled = true; 
-      });
+        .then(msg => {
+            statusEl.innerText = msg;
+            document.getElementById("scannedText").innerText = "No scan yet...";
+            document.getElementById("manualInput").value = "";
+            document.getElementById("yearLevel").value = "";
+            lastScanned = "";
+        }).catch((error) => { 
+            console.error("Error sending data:", error); 
+            statusEl.innerText = "Failed to send: " + error.message;
+        }).finally(() => {
+            document.getElementById("loading").style.display = "none";
+            submitBtn.disabled = true; 
+        });
 
     closePopup();
 }
@@ -61,7 +78,7 @@ function submitAttendance() {
 function onScanSuccess(decodedText) {
     lastScanned = decodedText;
     document.getElementById("scannedText").innerText = decodedText;
-    document.getElementById("status").innerText = "QR SCANNED. Select year level.";
+    document.getElementById("status").innerText = "QR scanned. Select year level.";
     checkInputs();
     showPopup(decodedText);
 }
@@ -89,18 +106,8 @@ function closePopup() {
 
 function checkInputs() {
     const manualInput = document.getElementById("manualInput").value.trim();
-    const yearLevel = document.getElementById("yearLevel").value;
-    const hasImage = uploadedImageBase64 !== null;
-    const hasData = manualInput || lastScanned;
-    
-    const enable = hasData && yearLevel && hasImage;
+    const enable = manualInput || lastScanned;
     document.getElementById("submitBtn").disabled = !enable;
-    
-    if (hasData && yearLevel && !hasImage) {
-        document.getElementById("status").innerText = "Please upload an e-signature image.";
-    } else if (hasData && !yearLevel) {
-        document.getElementById("status").innerText = "Please select year level.";
-    }
 }
 
 Html5Qrcode.getCameras().then(devices => {
@@ -112,7 +119,10 @@ Html5Qrcode.getCameras().then(devices => {
 
         scanner.start(
             { deviceId: { exact: backCam.id } },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
+            { 
+                fps: 10, 
+                qrbox: { width: 250, height: 250 }
+            },
             onScanSuccess
         ).then(() => {
             enableZoomControl();
@@ -162,30 +172,6 @@ function enableZoomControl() {
     }, 1000); 
 }
 
-function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        uploadedImageBase64 = e.target.result;
-        
-        const preview = document.getElementById('previewImage');
-        const container = document.getElementById('imagePreview');
-        preview.src = uploadedImageBase64;
-        container.style.display = 'block';
-        
-        checkInputs();
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeImage() {
-    uploadedImageBase64 = null;
-    document.getElementById('signatureUpload').value = '';
-    document.getElementById('imagePreview').style.display = 'none';
-    checkInputs();
-}
-
 document.getElementById("yearLevel").addEventListener("change", checkInputs);
+
 checkInputs();
