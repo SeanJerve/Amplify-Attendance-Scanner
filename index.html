@@ -14,43 +14,113 @@
   <h1 class="project-title">Project Pre<span class="ceng-highlight">CENG</span>t</h1>
 </div>
 
-  <h2>Attendance Scanner</h2>
-    <div id="reader" class="glass-container"></div>
-    <div class="scanner-overlay"></div>
+<h2>Attendance Scanner</h2>
+<div id="reader" class="glass-container"></div>
+<div class="scanner-overlay"></div>
 
-    <input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
+<input type="range" id="zoomSlider" min="1" max="1" step="0.1" value="1" disabled>
 
-    <pre id="scannedText" class="glass-container">No scan yet...</pre>
+<pre id="scannedText" class="glass-container">No scan yet...</pre>
 
-    <div class="control-section glass-container">
-        <label for="yearLevel">Select Year Level:</label>
-        <select id="yearLevel">
-            <option value="">Select</option>
-            <option value="1st Year">1st Year</option>
-            <option value="2nd Year">2nd Year</option>
-            <option value="3rd Year">3rd Year</option>
-            <option value="4th Year">4th Year</option>
-        </select>
-        <button onclick="submitAttendance()" id="submitBtn" disabled>Confirm & Send</button>
-    </div>
+<div class="control-section glass-container">
+    <label for="yearLevel">Select Year Level:</label>
+    <select id="yearLevel">
+        <option value="">Select</option>
+        <option value="1st Year">1st Year</option>
+        <option value="2nd Year">2nd Year</option>
+        <option value="3rd Year">3rd Year</option>
+        <option value="4th Year">4th Year</option>
+    </select>
+</div>
 
-    <p id="status" class="glass-container">Waiting for scan or input...</p>
+<!-- Signature Pad Section -->
+<div class="glass-container">
+    <h3>Signature</h3>
+    <canvas id="signature-pad" width="400" height="200" style="border:1px solid #ccc; background:#fff;"></canvas>
+    <br>
+    <button type="button" onclick="clearSignature()">Clear</button>
+</div>
 
-    <hr>
-    <h3>Manual Input</h3>
-    <textarea id="manualInput" placeholder="Paste QR Data here. ex.1234-1234-1234JUAN DELA CRUZCOLLEGE OF ENGINEERING..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
+<div class="glass-container">
+    <button onclick="submitAttendance()" id="submitBtn" disabled>Confirm & Send</button>
+</div>
 
-    <div id="overlay"></div>
-    <div id="popup">
-        <h3>Student Info</h3>
-        <pre id="popupContent"></pre>
-        <button onclick="closePopup()">OK</button>
-    </div>
+<p id="status" class="glass-container">Waiting for scan or input...</p>
 
-    <div id="loading">Sending attendance... Please wait.</div>
+<hr>
+<h3>Manual Input</h3>
+<textarea id="manualInput" placeholder="Paste QR Data here. ex.1234-1234-1234JUAN DELA CRUZCOLLEGE OF ENGINEERING..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
 
-    <script src="script.js"></script>
+<div id="overlay"></div>
+<div id="popup">
+    <h3>Student Info</h3>
+    <pre id="popupContent"></pre>
+    <button onclick="closePopup()">OK</button>
+</div>
+
+<div id="loading">Sending attendance... Please wait.</div>
+
+<script>
+// ---------------- Signature Drawing ----------------
+const canvas = document.getElementById("signature-pad");
+const ctx = canvas.getContext("2d");
+
+let drawing = false;
+
+canvas.addEventListener("mousedown", startDraw);
+canvas.addEventListener("mouseup", endDraw);
+canvas.addEventListener("mousemove", draw);
+
+canvas.addEventListener("touchstart", startDraw);
+canvas.addEventListener("touchend", endDraw);
+canvas.addEventListener("touchmove", draw);
+
+function startDraw(e) {
+  e.preventDefault();
+  drawing = true;
+  ctx.beginPath();
+  ctx.moveTo(getX(e), getY(e));
+}
+
+function endDraw(e) {
+  e.preventDefault();
+  drawing = false;
+}
+
+function draw(e) {
+  if (!drawing) return;
+  e.preventDefault();
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "black";
+  ctx.lineTo(getX(e), getY(e));
+  ctx.stroke();
+}
+
+function getX(e) {
+  if (e.touches) return e.touches[0].clientX - canvas.getBoundingClientRect().left;
+  return e.clientX - canvas.getBoundingClientRect().left;
+}
+
+function getY(e) {
+  if (e.touches) return e.touches[0].clientY - canvas.getBoundingClientRect().top;
+  return e.clientY - canvas.getBoundingClientRect().top;
+}
+
+// Clear signature
+function clearSignature() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Get signature as image (to send later)
+function getSignatureData() {
+  return canvas.toDataURL("image/png");
+}
+</script>
+
+<script src="script.js"></script>
 </body>
+
 <footer>
   <div class="footer-container">
     <div class="brand-header">
