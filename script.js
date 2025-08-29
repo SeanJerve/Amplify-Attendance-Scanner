@@ -1,31 +1,8 @@
-
-const endpoint = "https://script.google.com/macros/s/AKfycbxpQ4pB9NZKtH_7KfhCGUcH13VziCB_Vbu1xmYCjGqtZ8A_Xkaij9FWqu5cTlJ1lSm3Eg/exec";
+const endpoint = "https://script.google.com/macros/s/AKfycbxP_SFTLhNt6Mv7jyFChtROvTWRwVHSJ7_p98i-R478cjxC_7JMxeYr62ppLz8I3sRN0Q/exec";
 const scanner = new Html5Qrcode("reader");
 let videoTrack = null;
 let lastScanned = "";
-
-function sendToScript(data) {
-    document.getElementById("loading").style.display = "flex";
-
-    fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: data
-    }).then(res => res.text())
-        .then(msg => {
-            document.getElementById("status").innerText = msg;
-            document.getElementById("submitBtn").disabled = true;
-            document.getElementById("scannedText").innerText = "No scan yet...";
-            document.getElementById("manualInput").value = "";
-            document.getElementById("yearLevel").value = ""; 
-            lastScanned = "";
-        }).catch((error) => { 
-            console.error("Error sending data:", error);
-            document.getElementById("status").innerText = "Failed to send: " + error.message; 
-        }).finally(() => {
-            document.getElementById("loading").style.display = "none";
-        });
-}
+let uploadedImageBase64 = null;
 
 function submitAttendance() {
     const yearLevel = document.getElementById("yearLevel").value;
@@ -37,7 +14,6 @@ function submitAttendance() {
         alert("Please select year level.");
         return;
     }
-
     if (!uploadedImageBase64) {
         alert("Please upload an e-signature image.");
         return;
@@ -49,11 +25,11 @@ function submitAttendance() {
         return;
     }
 
-    const payload = JSON.stringify({
-        studentData: studentData,
-        yearLevel: yearLevel,
+    const payload = {
+        studentData,
+        yearLevel,
         signature: uploadedImageBase64
-    });
+    };
 
     statusEl.innerText = "Sending...";
     submitBtn.disabled = true;
@@ -62,22 +38,22 @@ function submitAttendance() {
     fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: payload
+        body: JSON.stringify(payload)
     }).then(res => res.text())
-        .then(msg => {
-            statusEl.innerText = msg;
-            document.getElementById("scannedText").innerText = "No scan yet...";
-            document.getElementById("manualInput").value = "";
-            document.getElementById("yearLevel").value = "";
-            removeImage();
-            lastScanned = "";
-        }).catch((error) => { 
-            console.error("Error sending data:", error); 
-            statusEl.innerText = "Failed to send: " + error.message;
-        }).finally(() => {
-            document.getElementById("loading").style.display = "none";
-            submitBtn.disabled = true; 
-        });
+      .then(msg => {
+          statusEl.innerText = msg;
+          document.getElementById("scannedText").innerText = "No scan yet...";
+          document.getElementById("manualInput").value = "";
+          document.getElementById("yearLevel").value = "";
+          removeImage();
+          lastScanned = "";
+      }).catch((error) => { 
+          console.error("Error sending data:", error); 
+          statusEl.innerText = "Failed to send: " + error.message;
+      }).finally(() => {
+          document.getElementById("loading").style.display = "none";
+          submitBtn.disabled = true; 
+      });
 
     closePopup();
 }
@@ -136,10 +112,7 @@ Html5Qrcode.getCameras().then(devices => {
 
         scanner.start(
             { deviceId: { exact: backCam.id } },
-            { 
-                fps: 10, 
-                qrbox: { width: 250, height: 250 }
-            },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
             onScanSuccess
         ).then(() => {
             enableZoomControl();
@@ -189,13 +162,9 @@ function enableZoomControl() {
     }, 1000); 
 }
 
-let uploadedImageBase64 = null;
-
 function handleImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-
-
 
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -219,5 +188,4 @@ function removeImage() {
 }
 
 document.getElementById("yearLevel").addEventListener("change", checkInputs);
-
 checkInputs();
