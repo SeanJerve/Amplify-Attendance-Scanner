@@ -1029,3 +1029,140 @@ body::before {
         width: clamp(3.5rem, 6vw, 5rem);
     }
 }
+
+/* Signature Section Styles */
+.signature-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+}
+
+#signatureCanvas {
+    border: 2px solid var(--color-deep-blue);
+    border-radius: var(--border-radius);
+    background: var(--color-white);
+    cursor: crosshair;
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.1),
+        0 0 20px rgba(0, 220, 253, 0.05);
+    transition: all 0.3s ease;
+    max-width: 100%;
+    height: auto;
+}
+
+#signatureCanvas:hover {
+    border-color: var(--color-cyan);
+    box-shadow: 
+        0 12px 30px rgba(0, 0, 0, 0.15),
+        0 0 25px rgba(0, 220, 253, 0.1);
+}
+
+.signature-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.secondary-btn {
+    background: var(--color-medium-blue);
+    color: var(--color-white);
+    border-color: var(--color-medium-blue);
+    font-size: clamp(0.7rem, 2vw, 0.8rem);
+    padding: clamp(6px, 2vw, 10px) clamp(12px, 3vw, 16px);
+    min-height: clamp(36px, 7vw, 42px);
+    min-width: clamp(100px, 25vw, 140px);
+}
+
+.secondary-btn:hover:not(:disabled) {
+    background: var(--color-deep-blue);
+    border-color: var(--color-cyan);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.signature-preview {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px dashed var(--color-medium-blue);
+    width: 100%;
+    max-width: 300px;
+}
+
+.signature-preview img {
+    max-width: 100%;
+    max-height: 60px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.signature-preview:empty::before {
+    content: "Signature will appear here";
+    color: var(--color-medium-blue);
+    font-style: italic;
+    font-size: clamp(0.7rem, 2vw, 0.8rem);
+}
+
+/* Responsive adjustments for signature section */
+@media (max-width: 480px) {
+    .signature-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .secondary-btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    #signatureCanvas {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .signature-section {
+        width: 500px;
+    }
+    
+    #signatureCanvas {
+        width: 400px;
+        height: 200px;
+    }
+}
+
+/* Additional responsive adjustments for signature canvas */
+@media (max-width: 768px) {
+    #signatureCanvas {
+        width: 100%;
+        max-width: 300px;
+        height: 120px;
+    }
+    
+    .signature-section {
+        padding: var(--spacing-md);
+    }
+}
+
+/* Touch-friendly signature canvas */
+@media (hover: none) and (pointer: coarse) {
+    #signatureCanvas {
+        cursor: default;
+    }
+    
+    .signature-controls {
+        gap: var(--spacing-md);
+    }
+    
+    .secondary-btn {
+        min-height: clamp(44px, 10vw, 48px);
+        font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    }
+}
