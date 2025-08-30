@@ -40,6 +40,17 @@
     <h3>Manual Input</h3>
     <textarea id="manualInput" placeholder="Paste QR Data here. ex.1234-1234-1234JUAN DELA CRUZCOLLEGE OF ENGINEERING..." rows="4" cols="40" oninput="checkInputs()" class="glass-container"></textarea>
 
+    <hr>
+    <h3>E-Signature</h3>
+    <div class="signature-section glass-container">
+        <canvas id="signatureCanvas" width="300" height="150"></canvas>
+        <div class="signature-controls">
+            <button type="button" onclick="clearSignature()" class="secondary-btn">Clear Signature</button>
+            <button type="button" onclick="captureSignature()" class="secondary-btn">Capture Signature</button>
+        </div>
+        <div id="signaturePreview" class="signature-preview"></div>
+    </div>
+
     <div id="overlay"></div>
     <div id="popup">
         <h3>Student Info</h3>
