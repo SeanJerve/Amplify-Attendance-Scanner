@@ -1,4 +1,4 @@
-const endpoint = "https://script.google.com/macros/s/AKfycbyW__TSOY3cEzXXyOAxwJHfRWT8NDdsHf3SYFxTRi6B9kv12nrKjN1hJ907NOaJLMSNAw/exec";
+const endpoint = "https://script.google.com/macros/s/AKfycbzWe6cmnKSEhFAehWZj6OqeCuJI49TMIfhPh8f0CJJ3_csiGX_iFyWpLV4DqGwzNuUrkg/exec";
 const scanner = new Html5Qrcode("reader");
 let videoTrack = null;
 let lastScanned = "";
